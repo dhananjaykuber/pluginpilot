@@ -1,6 +1,11 @@
 import type { Octokit } from '@octokit/rest'
 import type { InstalledPlugin, PluginScan } from '../../shared/types'
-import { getLockedPlugins, getPluginInstallerPath, parseComposerJson } from './composer'
+import {
+  getLockedPlugins,
+  getPluginInstallerPath,
+  getRequiredPackages,
+  parseComposerJson
+} from './composer'
 import { mapWithConcurrency } from './concurrency'
 import { getAuthenticatedOctokit, isNotFoundError } from './github'
 import { readDirectory, readTextFile, type RepositoryRef } from './githubContent'
@@ -22,16 +27,21 @@ export async function scanProjectPlugins(projectId: string, branch: string): Pro
 
   await assertBranchExists(octokit, location)
 
-  const composerPlugins = await scanComposerPlugins(octokit, location)
-  const composerSlugs = new Set(composerPlugins.map((plugin) => plugin.slug))
-  const folderPlugins = await Promise.all(
-    project.pluginPaths.map((path) => scanPluginFolder(octokit, location, path, composerSlugs))
-  )
+  const [pluginsPerFolder, composerPlugins] = await Promise.all([
+    Promise.all(project.pluginPaths.map((path) => scanPluginFolder(octokit, location, path))),
+    scanComposerPlugins(octokit, location)
+  ])
+  const committedPlugins = pluginsPerFolder.flat()
+
+  // Committed plugin code is what gets deployed, so a committed folder always wins over
+  // Composer, even if composer.json still lists the plugin.
+  const committedSlugs = new Set(committedPlugins.map((plugin) => plugin.slug))
+  const composerOnlyPlugins = composerPlugins.filter((plugin) => !committedSlugs.has(plugin.slug))
 
   return {
     branch,
     scannedAt: new Date().toISOString(),
-    plugins: [...composerPlugins, ...folderPlugins.flat()].sort((a, b) =>
+    plugins: [...committedPlugins, ...composerOnlyPlugins].sort((a, b) =>
       a.name.localeCompare(b.name)
     )
   }
@@ -54,6 +64,8 @@ async function assertBranchExists(octokit: Octokit, location: RepositoryRef): Pr
   }
 }
 
+// Plugins required in composer.json, with versions from composer.lock. A stale lock file can
+// still list plugins that were removed from composer.json, so those are ignored.
 async function scanComposerPlugins(
   octokit: Octokit,
   location: RepositoryRef
@@ -62,15 +74,19 @@ async function scanComposerPlugins(
     readTextFile(octokit, location, 'composer.lock'),
     readTextFile(octokit, location, 'composer.json')
   ])
+  const composer = composerContents ? parseComposerJson(composerContents) : null
 
-  if (!lockContents) {
+  if (!lockContents || !composer) {
     return []
   }
 
-  const composer = composerContents ? parseComposerJson(composerContents) : null
-  const installPath = (composer && getPluginInstallerPath(composer)) ?? DEFAULT_COMPOSER_PLUGIN_PATH
+  const requiredPackages = getRequiredPackages(composer)
+  const installPath = getPluginInstallerPath(composer) ?? DEFAULT_COMPOSER_PLUGIN_PATH
+  const lockedPlugins = getLockedPlugins(lockContents).filter((plugin) =>
+    requiredPackages.has(plugin.packageName)
+  )
 
-  return getLockedPlugins(lockContents).map((plugin) => ({
+  return lockedPlugins.map((plugin) => ({
     slug: plugin.slug,
     name: plugin.slug,
     version: plugin.version,
@@ -79,18 +95,14 @@ async function scanComposerPlugins(
   }))
 }
 
-// Plugins committed to the repository. Folders installed by Composer are skipped,
-// so a plugin is never listed twice.
+// Plugins committed to the repository.
 async function scanPluginFolder(
   octokit: Octokit,
   location: RepositoryRef,
-  folderPath: string,
-  composerSlugs: Set<string>
+  folderPath: string
 ): Promise<InstalledPlugin[]> {
   const entries = await readDirectory(octokit, location, folderPath)
-  const slugs = (entries ?? [])
-    .filter((entry) => entry.type === 'dir' && !composerSlugs.has(entry.name))
-    .map((entry) => entry.name)
+  const slugs = (entries ?? []).filter((entry) => entry.type === 'dir').map((entry) => entry.name)
 
   const plugins = await mapWithConcurrency(slugs, SCAN_CONCURRENCY, (slug) =>
     readFolderPlugin(octokit, location, `${folderPath}/${slug}`, slug)
