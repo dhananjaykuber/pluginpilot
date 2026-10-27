@@ -6,6 +6,16 @@ export function listProjects(): Project[] {
   return store.get('projects')
 }
 
+export function getProject(projectId: string): Project {
+  const project = listProjects().find((candidate) => candidate.id === projectId)
+
+  if (!project) {
+    throw new Error('Project not found.')
+  }
+
+  return project
+}
+
 export function addProject(input: NewProject): Project {
   const projects = listProjects()
   const isDuplicate = projects.some(
