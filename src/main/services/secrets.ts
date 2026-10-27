@@ -19,7 +19,14 @@ export function getSecret(name: SecretName): string | null {
     return null
   }
 
-  return safeStorage.decryptString(Buffer.from(encrypted, 'base64'))
+  try {
+    return safeStorage.decryptString(Buffer.from(encrypted, 'base64'))
+  } catch {
+    // The keychain key that encrypted this value is gone, e.g. after moving the app's data
+    // to another Mac. The value can never be read again, so forget it and ask for it anew.
+    clearSecret(name)
+    return null
+  }
 }
 
 export function clearSecret(name: SecretName): void {
