@@ -57,17 +57,46 @@ export function shortenPluginName(name: string): string {
   return shortName.trim() || name
 }
 
-export function filterPlugins(plugins: PluginListItem[], search: string): PluginListItem[] {
-  const query = search.trim().toLowerCase()
+export type PluginFilter = 'all' | 'updates' | 'vulnerable' | 'not-on-wordpress-org' | 'open-pr'
 
-  if (!query) {
-    return plugins
-  }
+export const pluginFilters: {
+  value: PluginFilter
+  label: string
+  matches: (plugin: PluginListItem) => boolean
+}[] = [
+  { value: 'all', label: 'All', matches: () => true },
+  { value: 'updates', label: 'Updates available', matches: (plugin) => !!plugin.availableVersion },
+  {
+    value: 'vulnerable',
+    label: 'Vulnerable',
+    matches: (plugin) => !!plugin.vulnerabilities?.length
+  },
+  {
+    value: 'not-on-wordpress-org',
+    label: 'Not on WordPress.org',
+    matches: (plugin) => plugin.isOnWordPressOrg === false
+  },
+  { value: 'open-pr', label: 'Open pull request', matches: (plugin) => !!plugin.pullRequest }
+]
+
+export function filterPlugins(
+  plugins: PluginListItem[],
+  search: string,
+  filter: PluginFilter
+): PluginListItem[] {
+  const query = search.trim().toLowerCase()
+  const { matches } = getPluginFilter(filter)
 
   return plugins.filter(
     (plugin) =>
-      plugin.displayName.toLowerCase().includes(query) || plugin.slug.toLowerCase().includes(query)
+      matches(plugin) &&
+      (plugin.displayName.toLowerCase().includes(query) ||
+        plugin.slug.toLowerCase().includes(query))
   )
+}
+
+export function getPluginFilter(filter: PluginFilter): (typeof pluginFilters)[number] {
+  return pluginFilters.find((option) => option.value === filter) ?? pluginFilters[0]
 }
 
 // Composer plugins only know their slug, so use the WordPress.org name when there is one.

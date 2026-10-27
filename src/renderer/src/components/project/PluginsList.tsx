@@ -3,8 +3,9 @@ import type { PluginScan } from '@shared/types'
 import { usePluginReleases } from '@/hooks/usePluginReleases'
 import { useUpdatePullRequests } from '@/hooks/useUpdatePullRequests'
 import { useVulnerabilities } from '@/hooks/useVulnerabilities'
-import { filterPlugins, toPluginListItems } from '@/lib/plugins'
+import { filterPlugins, toPluginListItems, type PluginFilter } from '@/lib/plugins'
 import type { UpdateTarget } from '@/lib/pluginUpdate'
+import { PluginFilterMenu } from './PluginFilterMenu'
 import { PluginsTable } from './PluginsTable'
 import { PluginsToolbar } from './PluginsToolbar'
 import { ReleasesStatus } from './ReleasesStatus'
@@ -17,6 +18,7 @@ type PluginsListProps = {
 
 export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Element {
   const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState<PluginFilter>('all')
   const releases = usePluginReleases(scan.plugins.map((plugin) => plugin.slug))
   const vulnerabilities = useVulnerabilities(
     scan.plugins.map(({ slug, version }) => ({ slug, version }))
@@ -30,7 +32,7 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
     vulnerabilities.data,
     pullRequests.data
   )
-  const visibleItems = filterPlugins(items, search)
+  const visibleItems = filterPlugins(items, search, filter)
   const updateCount = items.filter((item) => item.availableVersion).length
   const vulnerablePluginCount = items.filter((item) => item.vulnerabilities?.length).length
 
@@ -39,8 +41,10 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
       <PluginsToolbar
         search={search}
         onSearchChange={setSearch}
+        visibleCount={visibleItems.length}
         totalCount={items.length}
         scannedAt={scan.scannedAt}
+        filterMenu={<PluginFilterMenu value={filter} onChange={setFilter} plugins={items} />}
       />
       <div className="space-y-1">
         <ReleasesStatus
@@ -61,7 +65,7 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
         <PluginsTable plugins={visibleItems} target={target} />
       ) : (
         <p className="py-10 text-center text-sm text-muted-foreground">
-          No plugins match your search.
+          No plugins match the current filter and search.
         </p>
       )}
     </div>
