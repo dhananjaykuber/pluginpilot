@@ -14,3 +14,9 @@ export type Project = {
   localPath?: string
   createdAt: string
 }
+
+export type GitHubUser = {
+  login: string
+  name: string
+  avatarUrl: string
+}

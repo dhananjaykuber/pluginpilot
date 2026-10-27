@@ -6,6 +6,11 @@ const api: PluginPilotApi = {
   app: {
     getVersion: () => ipcRenderer.invoke(IpcChannels.appGetVersion)
   },
+  auth: {
+    getUser: () => ipcRenderer.invoke(IpcChannels.authGetUser),
+    connect: (token) => ipcRenderer.invoke(IpcChannels.authConnect, token),
+    disconnect: () => ipcRenderer.invoke(IpcChannels.authDisconnect)
+  },
   projects: {
     list: () => ipcRenderer.invoke(IpcChannels.projectsList)
   }
