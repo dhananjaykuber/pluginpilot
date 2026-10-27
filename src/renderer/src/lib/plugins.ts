@@ -50,6 +50,13 @@ export function toPluginListItems(
     .sort((a, b) => a.displayName.localeCompare(b.displayName))
 }
 
+// Many plugin names append a tagline, e.g. "CookieYes – Cookie Banner for Cookie Consent" or
+// "Asset CleanUp: Page Speed Booster". Keeps the part before the first dash or colon.
+export function shortenPluginName(name: string): string {
+  const [shortName] = name.split(/\s+[–—-]\s+|:\s+/)
+  return shortName.trim() || name
+}
+
 export function filterPlugins(plugins: PluginListItem[], search: string): PluginListItem[] {
   const query = search.trim().toLowerCase()
 

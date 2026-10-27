@@ -7,7 +7,7 @@ import type {
   UploadedPluginZip
 } from '@shared/types'
 import { compareVersions } from '@shared/versions'
-import type { PluginListItem } from './plugins'
+import { shortenPluginName, type PluginListItem } from './plugins'
 
 export type UpdateTarget = {
   projectId: string
@@ -99,7 +99,8 @@ function getUpdateDetails(
     projectId: target.projectId,
     environmentName: target.environment.name,
     slug: plugin.slug,
-    name: plugin.displayName,
+    // The short name keeps PR titles, descriptions and commit messages readable.
+    name: shortenPluginName(plugin.displayName),
     path: plugin.path,
     fromVersion,
     toVersion,

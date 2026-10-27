@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
+import { pluginSourceLabels, shortenPluginName, type PluginListItem } from '@/lib/plugins'
 import type { UpdateTarget } from '@/lib/pluginUpdate'
 import { PluginAction } from './PluginAction'
 import { VulnerabilityBadge } from './VulnerabilityBadge'
@@ -14,7 +14,9 @@ export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element
   return (
     <TableRow>
       <TableCell>
-        <p className="font-medium">{plugin.displayName}</p>
+        <p className="font-medium" title={plugin.displayName}>
+          {shortenPluginName(plugin.displayName)}
+        </p>
         <p className="font-mono text-xs text-muted-foreground">{plugin.path}</p>
       </TableCell>
       <TableCell>
