@@ -60,7 +60,7 @@ function PluginsTableFrame({ children }: { children: React.ReactNode }): React.J
           <TableHead className="w-32">Source</TableHead>
           <TableHead className="w-56">Version</TableHead>
           <TableHead className="w-44">Known Vulnerabilities</TableHead>
-          <TableHead className="w-28">Action</TableHead>
+          <TableHead className="w-32">Action</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>{children}</TableBody>

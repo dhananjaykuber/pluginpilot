@@ -19,7 +19,7 @@ export function UpdatePluginButton({
     <>
       <Button size="sm" variant="outline" onClick={() => setIsOpen(true)}>
         <GitPullRequestArrowIcon data-icon="inline-start" />
-        Update
+        Create PR
       </Button>
       {isOpen && (
         <UpdatePluginDialog
