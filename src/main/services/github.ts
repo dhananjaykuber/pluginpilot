@@ -1,5 +1,16 @@
 import { Octokit } from '@octokit/rest'
 import type { GitHubUser } from '../../shared/types'
+import { getGitHubToken } from './githubToken'
+
+export function getAuthenticatedOctokit(): Octokit {
+  const token = getGitHubToken()
+
+  if (!token) {
+    throw new Error('You are not signed in to GitHub.')
+  }
+
+  return new Octokit({ auth: token })
+}
 
 export async function fetchGitHubUser(token: string): Promise<GitHubUser> {
   const { data } = await new Octokit({ auth: token }).rest.users.getAuthenticated()

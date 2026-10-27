@@ -14,6 +14,15 @@ export type Project = {
   createdAt: string
 }
 
+export type RepositorySummary = {
+  owner: string
+  name: string
+  fullName: string
+  isPrivate: boolean
+  defaultBranch: string
+  ownerAvatarUrl: string
+}
+
 export type GitHubUser = {
   login: string
   name: string

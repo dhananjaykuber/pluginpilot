@@ -1,9 +1,12 @@
-import { GitBranchPlusIcon } from 'lucide-react'
+import { useState } from 'react'
+import type { RepositorySummary } from '@shared/types'
 import { PageHeader } from '@/components/common/PageHeader'
-import { EmptyState } from '@/components/common/EmptyState'
+import { RepositoryPicker } from '@/components/add-project/RepositoryPicker'
 import { paths } from '@/lib/paths'
 
 export function AddProjectPage(): React.JSX.Element {
+  const [repository, setRepository] = useState<RepositorySummary | null>(null)
+
   return (
     <>
       <PageHeader
@@ -11,11 +14,9 @@ export function AddProjectPage(): React.JSX.Element {
         description="Connect a GitHub repository and map its environments to branches."
         breadcrumbs={[{ label: 'Projects', to: paths.projects }, { label: 'Add Project' }]}
       />
-      <EmptyState
-        icon={GitBranchPlusIcon}
-        title="Repository setup"
-        description="Picking a repository and configuring environments will appear here."
-      />
+      <div className="max-w-3xl space-y-6">
+        <RepositoryPicker selected={repository} onSelect={setRepository} />
+      </div>
     </>
   )
 }
