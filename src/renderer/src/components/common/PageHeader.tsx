@@ -1,3 +1,4 @@
+import { BackLink } from './BackLink'
 import { PageBreadcrumbs, type Crumb } from './PageBreadcrumbs'
 
 type PageHeaderProps = {
@@ -13,8 +14,11 @@ export function PageHeader({
   breadcrumbs,
   actions
 }: PageHeaderProps): React.JSX.Element {
+  const parent = breadcrumbs && findParentCrumb(breadcrumbs)
+
   return (
     <header className="mb-6 space-y-3">
+      {parent?.to && <BackLink to={parent.to} label={parent.label} />}
       {breadcrumbs && <PageBreadcrumbs items={breadcrumbs} />}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
@@ -25,4 +29,9 @@ export function PageHeader({
       </div>
     </header>
   )
+}
+
+// Back goes up to the closest linked breadcrumb, so it never depends on navigation history.
+function findParentCrumb(breadcrumbs: Crumb[]): Crumb | undefined {
+  return breadcrumbs.findLast((crumb) => crumb.to)
 }
