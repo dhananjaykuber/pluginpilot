@@ -46,6 +46,11 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.pluginpilot.app')
 
+  // In development the Dock shows the Electron binary's icon; packaged apps use build/icon.icns.
+  if (process.platform === 'darwin' && is.dev) {
+    app.dock?.setIcon(icon)
+  }
+
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // Zoom is allowed, otherwise Cmd + Minus is blocked while Cmd + = still zooms in.
