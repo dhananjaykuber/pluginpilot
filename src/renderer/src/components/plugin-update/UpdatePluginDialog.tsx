@@ -11,6 +11,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { FieldError } from '@/components/common/FieldError'
+import { useChangelog } from '@/hooks/useChangelog'
 import { useUpdatePlugin } from '@/hooks/useUpdatePlugin'
 import { getErrorMessage } from '@/lib/errors'
 import { queryKeys } from '@/lib/queryClient'
@@ -32,11 +33,15 @@ export function UpdatePluginDialog({
 }: UpdatePluginDialogProps): React.JSX.Element {
   const queryClient = useQueryClient()
   const updatePlugin = useUpdatePlugin()
+  const changelog = useChangelog(update)
 
   function handleCreate(): void {
-    updatePlugin.mutate(update, {
-      onSuccess: (result) => toast.success(`Pull request #${result.pullRequestNumber} created`)
-    })
+    updatePlugin.mutate(
+      { ...update, changelog: changelog.data ?? [] },
+      {
+        onSuccess: (result) => toast.success(`Pull request #${result.pullRequestNumber} created`)
+      }
+    )
   }
 
   // The pull request list is refreshed on close rather than on success, because the row
@@ -60,7 +65,7 @@ export function UpdatePluginDialog({
 
   return (
     <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={!updatePlugin.isPending}>
+      <DialogContent showCloseButton={!updatePlugin.isPending} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Update {update.name}</DialogTitle>
           <DialogDescription>
@@ -68,7 +73,12 @@ export function UpdatePluginDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <UpdateDialogBody update={update} baseBranch={baseBranch} updatePlugin={updatePlugin} />
+        <UpdateDialogBody
+          update={update}
+          baseBranch={baseBranch}
+          updatePlugin={updatePlugin}
+          changelog={changelog}
+        />
 
         <FieldError message={updatePlugin.isError ? getErrorMessage(updatePlugin.error) : null} />
 
@@ -80,7 +90,10 @@ export function UpdatePluginDialog({
               <Button variant="ghost" onClick={handleClose} disabled={updatePlugin.isPending}>
                 Cancel
               </Button>
-              <Button onClick={handleCreate} disabled={updatePlugin.isPending}>
+              <Button
+                onClick={handleCreate}
+                disabled={updatePlugin.isPending || changelog.isLoading}
+              >
                 {updatePlugin.isPending && (
                   <Loader2Icon data-icon="inline-start" className="animate-spin" />
                 )}
@@ -96,12 +109,14 @@ export function UpdatePluginDialog({
 
 type UpdateDialogBodyProps = Omit<UpdatePluginDialogProps, 'onClose'> & {
   updatePlugin: ReturnType<typeof useUpdatePlugin>
+  changelog: ReturnType<typeof useChangelog>
 }
 
 function UpdateDialogBody({
   update,
   baseBranch,
-  updatePlugin
+  updatePlugin,
+  changelog
 }: UpdateDialogBodyProps): React.JSX.Element {
   if (updatePlugin.isSuccess) {
     return <UpdateResult result={updatePlugin.data} />
@@ -111,5 +126,12 @@ function UpdateDialogBody({
     return <UpdateProgress currentStep={updatePlugin.step} update={update} />
   }
 
-  return <UpdateSummary update={update} baseBranch={baseBranch} />
+  return (
+    <UpdateSummary
+      update={update}
+      baseBranch={baseBranch}
+      changelog={changelog.data}
+      isChangelogLoading={changelog.isLoading}
+    />
+  )
 }

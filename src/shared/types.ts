@@ -97,6 +97,11 @@ export type VulnerabilityReport = {
   bySlug: Record<string, PluginVulnerability[]>
 }
 
+export type ChangelogEntry = {
+  version: string
+  notes: string[]
+}
+
 export type PluginUpdateDetails = {
   // Lets the renderer match progress events to the update it started.
   updateId: string
@@ -108,6 +113,8 @@ export type PluginUpdateDetails = {
   fromVersion: string
   toVersion: string
   changelogUrl: string | null
+  // Release notes between the two versions, when the changelog could be read.
+  changelog: ChangelogEntry[]
   securityFixes: { title: string; cve: string | null }[]
 }
 

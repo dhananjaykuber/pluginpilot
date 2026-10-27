@@ -4,7 +4,7 @@ import type { PluginUpdateProgress, PluginUpdateRequest } from '../../shared/typ
 import { scanProjectPlugins } from '../services/pluginScan'
 import { listUpdatePullRequests, updatePlugin } from '../services/pluginUpdate'
 import { chooseUploadedZip, type ExpectedPlugin } from '../services/uploadedZips'
-import { getPluginReleases } from '../services/wordpressOrg'
+import { getPluginChangelog, getPluginReleases } from '../services/wordpressOrg'
 
 export function registerPluginHandlers(): void {
   ipcMain.handle(IpcChannels.pluginsScan, (_event, projectId: string, branch: string) =>
@@ -12,6 +12,11 @@ export function registerPluginHandlers(): void {
   )
   ipcMain.handle(IpcChannels.pluginsGetReleases, (_event, slugs: string[]) =>
     getPluginReleases(slugs)
+  )
+  ipcMain.handle(
+    IpcChannels.pluginsGetChangelog,
+    (_event, slug: string, fromVersion: string, toVersion: string) =>
+      getPluginChangelog(slug, fromVersion, toVersion)
   )
   ipcMain.handle(
     IpcChannels.pluginsListUpdatePullRequests,

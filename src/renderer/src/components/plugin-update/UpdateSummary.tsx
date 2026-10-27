@@ -1,14 +1,23 @@
 import { ArrowRightIcon, ShieldAlertIcon } from 'lucide-react'
 import { getUpdateBranchName } from '@shared/pluginUpdate'
+import type { ChangelogEntry } from '@shared/types'
 import { pluralize } from '@/lib/format'
 import type { NewPluginUpdate } from '@/lib/pluginUpdate'
+import { ChangelogPreview } from './ChangelogPreview'
 
 type UpdateSummaryProps = {
   update: NewPluginUpdate
   baseBranch: string
+  changelog: ChangelogEntry[] | undefined
+  isChangelogLoading: boolean
 }
 
-export function UpdateSummary({ update, baseBranch }: UpdateSummaryProps): React.JSX.Element {
+export function UpdateSummary({
+  update,
+  baseBranch,
+  changelog,
+  isChangelogLoading
+}: UpdateSummaryProps): React.JSX.Element {
   return (
     <div className="space-y-4">
       <p className="flex items-center gap-2 font-mono text-lg">
@@ -51,6 +60,14 @@ export function UpdateSummary({ update, baseBranch }: UpdateSummaryProps): React
           </>
         )}
       </dl>
+
+      {update.changelogUrl && (
+        <ChangelogPreview
+          entries={changelog}
+          isLoading={isChangelogLoading}
+          changelogUrl={update.changelogUrl}
+        />
+      )}
     </div>
   )
 }

@@ -1,5 +1,8 @@
 import type { PluginUpdateRequest } from '../../shared/types'
 
+// Keeps the description readable when many versions are skipped; the link has the rest.
+const MAX_CHANGELOG_VERSIONS = 10
+
 export function buildUpdateTitle(request: PluginUpdateRequest): string {
   return `Update ${request.name} from ${request.fromVersion} to ${request.toVersion}`
 }
@@ -18,7 +21,7 @@ export function buildUpdateBody(request: PluginUpdateRequest, baseBranch: string
         : `| Path | \`${request.path}\` |`
     ].join('\n'),
     buildSecuritySection(request),
-    request.changelogUrl && `### Changelog\n\n${request.changelogUrl}`
+    buildChangelogSection(request)
   ]
 
   return sections.filter(Boolean).join('\n\n')
@@ -34,4 +37,16 @@ function buildSecuritySection(request: PluginUpdateRequest): string | null {
   )
 
   return ['### Security fixes', '', ...fixes].join('\n')
+}
+
+function buildChangelogSection(request: PluginUpdateRequest): string | null {
+  if (!request.changelogUrl) {
+    return null
+  }
+
+  const entries = request.changelog
+    .slice(0, MAX_CHANGELOG_VERSIONS)
+    .map(({ version, notes }) => [`**${version}**`, ...notes.map((note) => `- ${note}`)].join('\n'))
+
+  return ['### Changelog', ...entries, `[Full changelog](${request.changelogUrl})`].join('\n\n')
 }
