@@ -24,6 +24,14 @@ export function compareVersions(a: string, b: string): number {
   return 0
 }
 
+// "5.10.1" → "6.0.0" is a major update; "5.9" → "5.10" is not.
+export function isMajorUpdate(fromVersion: string, toVersion: string): boolean {
+  const [fromMajor] = fromVersion.split('.')
+  const [toMajor] = toVersion.split('.')
+
+  return Number(toMajor) > Number(fromMajor)
+}
+
 export function isNewerVersion(candidate: string, current: string): boolean {
   return compareVersions(candidate, current) > 0
 }

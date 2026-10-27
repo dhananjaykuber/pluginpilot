@@ -2,6 +2,7 @@ import type {
   InstalledPlugin,
   PluginRelease,
   PluginReleases,
+  PluginRequirements,
   PluginSource,
   PluginVulnerability,
   UpdatePullRequest,
@@ -19,6 +20,8 @@ export type PluginListItem = InstalledPlugin & {
   displayName: string
   availableVersion: string | null
   downloadUrl: string | null
+  // Minimum WordPress and PHP versions of the available release.
+  requirements: PluginRequirements | null
   // null while WordPress.org hasn't been checked yet.
   isOnWordPressOrg: boolean | null
   // null until vulnerabilities have been checked, or when no Wordfence key is set.
@@ -42,6 +45,7 @@ export function toPluginListItems(
         displayName: getDisplayName(plugin, release),
         availableVersion: getAvailableVersion(plugin, release),
         downloadUrl: release?.downloadUrl ?? null,
+        requirements: release?.requirements ?? null,
         isOnWordPressOrg: releases ? release !== null : null,
         vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null,
         pullRequest: findUpdatePullRequest(pullRequests ?? [], plugin.slug)

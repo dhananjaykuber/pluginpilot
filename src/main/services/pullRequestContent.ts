@@ -18,8 +18,11 @@ export function buildUpdateBody(request: PluginUpdateRequest, baseBranch: string
       `| Environment | ${request.environmentName} (\`${baseBranch}\`) |`,
       request.source === 'composer'
         ? `| Composer package | \`${request.packageName}\` |`
-        : `| Path | \`${request.path}\` |`
-    ].join('\n'),
+        : `| Path | \`${request.path}\` |`,
+      buildRequirementsRow(request)
+    ]
+      .filter(Boolean)
+      .join('\n'),
     buildSecuritySection(request),
     buildChangelogSection(request)
   ]
@@ -49,4 +52,11 @@ function buildChangelogSection(request: PluginUpdateRequest): string | null {
     .map(({ version, notes }) => [`**${version}**`, ...notes.map((note) => `- ${note}`)].join('\n'))
 
   return ['### Changelog', ...entries, `[Full changelog](${request.changelogUrl})`].join('\n\n')
+}
+
+function buildRequirementsRow(request: PluginUpdateRequest): string | null {
+  const { wordPress, php } = request.requirements ?? {}
+  const parts = [wordPress && `WordPress ${wordPress}`, php && `PHP ${php}`].filter(Boolean)
+
+  return parts.length > 0 ? `| Requires | ${parts.join(', ')} |` : null
 }

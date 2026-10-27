@@ -75,11 +75,18 @@ export type PluginScan = {
   plugins: InstalledPlugin[]
 }
 
+// Minimum versions a plugin release needs, as stated on WordPress.org.
+export type PluginRequirements = {
+  wordPress: string | null
+  php: string | null
+}
+
 export type PluginRelease = {
   slug: string
   name: string
   latestVersion: string
   downloadUrl: string
+  requirements: PluginRequirements
 }
 
 // Latest WordPress.org release per slug; null when the plugin isn't on WordPress.org.
@@ -123,6 +130,7 @@ export type PluginUpdateDetails = {
   fromVersion: string
   toVersion: string
   changelogUrl: string | null
+  requirements: PluginRequirements | null
   // Release notes between the two versions, when the changelog could be read.
   changelog: ChangelogEntry[]
   securityFixes: { title: string; cve: string | null }[]

@@ -1,3 +1,4 @@
+import { isMajorUpdate } from '@shared/versions'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, shortenPluginName, type PluginListItem } from '@/lib/plugins'
@@ -34,6 +35,16 @@ export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element
               {plugin.availableVersion} Available
             </Badge>
           )}
+          {plugin.version &&
+            plugin.availableVersion &&
+            isMajorUpdate(plugin.version, plugin.availableVersion) && (
+              <Badge
+                variant="outline"
+                className="border-amber-500/50 text-amber-700 dark:text-amber-400"
+              >
+                Major
+              </Badge>
+            )}
           {plugin.isOnWordPressOrg === false && (
             <span className="text-xs text-muted-foreground">Not on WordPress.org</span>
           )}

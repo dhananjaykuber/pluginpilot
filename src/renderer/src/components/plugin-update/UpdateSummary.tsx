@@ -1,9 +1,9 @@
-import { ArrowRightIcon, ShieldAlertIcon } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { getUpdateBranchName } from '@shared/pluginUpdate'
 import type { ChangelogEntry } from '@shared/types'
-import { pluralize } from '@/lib/format'
 import type { NewPluginUpdate } from '@/lib/pluginUpdate'
 import { ChangelogPreview } from './ChangelogPreview'
+import { UpdateNotices } from './UpdateNotices'
 
 type UpdateSummaryProps = {
   update: NewPluginUpdate
@@ -26,13 +26,7 @@ export function UpdateSummary({
         <span className="font-semibold">{update.toVersion}</span>
       </p>
 
-      {update.securityFixes.length > 0 && (
-        <p className="flex items-center gap-2 text-sm text-orange-700 dark:text-orange-400">
-          <ShieldAlertIcon className="size-4" />
-          Fixes{' '}
-          {pluralize(update.securityFixes.length, 'known vulnerability', 'known vulnerabilities')}
-        </p>
-      )}
+      <UpdateNotices update={update} />
 
       <dl className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
         <dt className="text-muted-foreground">Environment</dt>

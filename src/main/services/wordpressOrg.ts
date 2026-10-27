@@ -24,6 +24,9 @@ type PluginInfoResponse = {
   name: string
   version: string
   download_link: string
+  // WordPress.org sends false when a plugin doesn't state a minimum.
+  requires?: string | false
+  requires_php?: string | false
   sections?: { changelog?: string }
 }
 
@@ -58,7 +61,11 @@ async function fetchPluginRelease(slug: string): Promise<PluginRelease | null> {
     slug,
     name: decodeHtmlEntities(info.name),
     latestVersion: info.version,
-    downloadUrl: info.download_link
+    downloadUrl: info.download_link,
+    requirements: {
+      wordPress: info.requires || null,
+      php: info.requires_php || null
+    }
   }
 }
 

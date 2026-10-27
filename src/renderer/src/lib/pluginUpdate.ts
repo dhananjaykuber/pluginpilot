@@ -58,7 +58,8 @@ export function toPluginUpdate(
       ? `https://wordpress.org/plugins/${plugin.slug}/#developers`
       : null,
     // Filled in by the update dialog once the changelog has loaded.
-    changelog: []
+    changelog: [],
+    requirements: plugin.requirements
   }
 
   if (plugin.source === 'composer' && packageName) {
@@ -87,6 +88,7 @@ export function toZipUpdate(
     ...getUpdateDetails(plugin, target, plugin.version ?? '', zip.version),
     changelogUrl: null,
     changelog: [],
+    requirements: null,
     source: 'manual',
     zip: { from: 'upload', zipId: zip.zipId }
   }
@@ -97,7 +99,7 @@ function getUpdateDetails(
   target: UpdateTarget,
   fromVersion: string,
   toVersion: string
-): Omit<PluginUpdateDetails, 'updateId' | 'changelogUrl' | 'changelog'> {
+): Omit<PluginUpdateDetails, 'updateId' | 'changelogUrl' | 'changelog' | 'requirements'> {
   return {
     projectId: target.projectId,
     environmentName: target.environment.name,
