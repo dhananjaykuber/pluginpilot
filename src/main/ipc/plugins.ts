@@ -1,6 +1,11 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
-import type { PluginUpdateProgress, PluginUpdateRequest } from '../../shared/types'
+import type {
+  LocalModificationsRequest,
+  PluginUpdateProgress,
+  PluginUpdateRequest
+} from '../../shared/types'
+import { findLocalModifications } from '../services/pluginModifications'
 import { scanProjectPlugins } from '../services/pluginScan'
 import { listUpdatePullRequests, updatePlugin } from '../services/pluginUpdate'
 import { chooseUploadedZip, type ExpectedPlugin } from '../services/uploadedZips'
@@ -17,6 +22,10 @@ export function registerPluginHandlers(): void {
     IpcChannels.pluginsGetChangelog,
     (_event, slug: string, fromVersion: string, toVersion: string) =>
       getPluginChangelog(slug, fromVersion, toVersion)
+  )
+  ipcMain.handle(
+    IpcChannels.pluginsFindModifications,
+    (_event, request: LocalModificationsRequest) => findLocalModifications(request)
   )
   ipcMain.handle(
     IpcChannels.pluginsListUpdatePullRequests,

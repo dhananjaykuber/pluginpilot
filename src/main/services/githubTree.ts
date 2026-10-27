@@ -94,7 +94,7 @@ async function commitTreeEntries(
 }
 
 // Maps each file path in the folder to its blob SHA.
-async function listFolderFiles(
+export async function listFolderFiles(
   octokit: Octokit,
   repository: Repository,
   ref: string,
@@ -211,7 +211,7 @@ function splitIntoBatches(entries: TreeEntry[]): TreeEntry[][] {
 }
 
 // Git identifies file contents by the SHA-1 of "blob <size>\0<content>".
-function getGitBlobSha(content: Buffer): string {
+export function getGitBlobSha(content: Buffer): string {
   return createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex')
 }
 

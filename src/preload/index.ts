@@ -26,6 +26,8 @@ const api: PluginPilotApi = {
     getReleases: (slugs) => ipcRenderer.invoke(IpcChannels.pluginsGetReleases, slugs),
     getChangelog: (slug, fromVersion, toVersion) =>
       ipcRenderer.invoke(IpcChannels.pluginsGetChangelog, slug, fromVersion, toVersion),
+    findModifications: (request) =>
+      ipcRenderer.invoke(IpcChannels.pluginsFindModifications, request),
     listUpdatePullRequests: (projectId, baseBranch) =>
       ipcRenderer.invoke(IpcChannels.pluginsListUpdatePullRequests, projectId, baseBranch),
     chooseZip: (expected) => ipcRenderer.invoke(IpcChannels.pluginsChooseZip, expected),

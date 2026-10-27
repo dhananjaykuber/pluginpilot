@@ -2,7 +2,9 @@ import type {
   AppSettings,
   ChangelogEntry,
   GitHubUser,
+  LocalModificationsRequest,
   NewProject,
+  PluginModifications,
   PluginReleases,
   PluginScan,
   PluginUpdateProgress,
@@ -34,6 +36,7 @@ export const IpcChannels = {
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsGetChangelog: 'plugins:get-changelog',
+  pluginsFindModifications: 'plugins:find-modifications',
   pluginsListUpdatePullRequests: 'plugins:list-update-pull-requests',
   pluginsChooseZip: 'plugins:choose-zip',
   pluginsUpdate: 'plugins:update',
@@ -72,6 +75,7 @@ export type PluginPilotApi = {
       fromVersion: string,
       toVersion: string
     ) => Promise<ChangelogEntry[]>
+    findModifications: (request: LocalModificationsRequest) => Promise<PluginModifications>
     listUpdatePullRequests: (projectId: string, baseBranch: string) => Promise<UpdatePullRequest[]>
     // Resolves to null when the user cancels the file picker.
     chooseZip: (expected: { name: string; version: string }) => Promise<UploadedPluginZip | null>

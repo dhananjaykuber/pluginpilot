@@ -154,6 +154,27 @@ export type UploadedPluginZip = {
 
 export type PluginUpdateStep = 'prepare' | 'commit' | 'pull-request'
 
+export type LocalModificationsRequest = {
+  projectId: string
+  environmentName: string
+  slug: string
+  path: string
+  version: string
+}
+
+export type PluginFileChange = {
+  // Relative to the plugin folder.
+  path: string
+  kind: 'modified' | 'added' | 'removed'
+}
+
+// "unknown" when the original version can't be downloaded from WordPress.org.
+export type PluginModifications = {
+  status: 'unmodified' | 'modified' | 'unknown'
+  changes: PluginFileChange[]
+  totalChanges: number
+}
+
 export type PluginUpdateProgress = {
   updateId: string
   step: PluginUpdateStep
