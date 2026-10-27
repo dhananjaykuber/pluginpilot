@@ -1,9 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
-import { toPluginUpdate, type UpdateTarget } from '@/lib/pluginUpdate'
-import { UpdatePluginButton } from '@/components/plugin-update/UpdatePluginButton'
-import { PullRequestLink } from './PullRequestLink'
+import type { UpdateTarget } from '@/lib/pluginUpdate'
+import { PluginAction } from './PluginAction'
 import { VulnerabilityBadge } from './VulnerabilityBadge'
 
 type PluginRowProps = {
@@ -12,8 +11,6 @@ type PluginRowProps = {
 }
 
 export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element {
-  const update = toPluginUpdate(plugin, target)
-
   return (
     <TableRow>
       <TableCell>
@@ -48,11 +45,7 @@ export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element
         )}
       </TableCell>
       <TableCell>
-        {plugin.pullRequest ? (
-          <PullRequestLink pullRequest={plugin.pullRequest} />
-        ) : (
-          update && <UpdatePluginButton update={update} baseBranch={target.environment.branch} />
-        )}
+        <PluginAction plugin={plugin} target={target} />
       </TableCell>
     </TableRow>
   )
