@@ -20,6 +20,14 @@ export function useSelectedEnvironment(project: Project): SelectedEnvironment {
 
   return {
     environment,
-    selectEnvironment: (name) => setSearchParams({ [ENVIRONMENT_PARAM]: name }, { replace: true })
+    // Keeps other params, such as the selected tab.
+    selectEnvironment: (name) =>
+      setSearchParams(
+        (params) => {
+          params.set(ENVIRONMENT_PARAM, name)
+          return params
+        },
+        { replace: true }
+      )
   }
 }
