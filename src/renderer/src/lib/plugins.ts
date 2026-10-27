@@ -5,6 +5,7 @@ import type {
   PluginRequirements,
   PluginSource,
   PluginVulnerability,
+  ReleaseSource,
   UpdatePullRequest,
   VulnerabilityReport
 } from '@shared/types'
@@ -22,8 +23,10 @@ export type PluginListItem = InstalledPlugin & {
   downloadUrl: string | null
   // Minimum WordPress and PHP versions of the available release.
   requirements: PluginRequirements | null
-  // null while WordPress.org hasn't been checked yet.
+  // null while releases haven't been checked yet.
   isOnWordPressOrg: boolean | null
+  // Where the available version comes from; null when no source has the plugin.
+  releaseSource: ReleaseSource | null
   // null until vulnerabilities have been checked, or when no Wordfence key is set.
   vulnerabilities: PluginVulnerability[] | null
   // An open pull request that already updates this plugin.
@@ -46,7 +49,8 @@ export function toPluginListItems(
         availableVersion: getAvailableVersion(plugin, release),
         downloadUrl: release?.downloadUrl ?? null,
         requirements: release?.requirements ?? null,
-        isOnWordPressOrg: releases ? release !== null : null,
+        isOnWordPressOrg: releases ? release?.source === 'wordpress-org' : null,
+        releaseSource: release?.source ?? null,
         vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null,
         pullRequest: findUpdatePullRequest(pullRequests ?? [], plugin.slug)
       }
@@ -105,7 +109,7 @@ export function getPluginFilter(filter: PluginFilter): (typeof pluginFilters)[nu
 
 // Composer plugins only know their slug, so use the WordPress.org name when there is one.
 function getDisplayName(plugin: InstalledPlugin, release: PluginRelease | null): string {
-  return plugin.source === 'composer' && release ? release.name : plugin.name
+  return plugin.source === 'composer' && release?.name ? release.name : plugin.name
 }
 
 function getAvailableVersion(

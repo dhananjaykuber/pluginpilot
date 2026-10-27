@@ -28,14 +28,14 @@ export function ReleasesStatus({
   }
 
   if (isChecking) {
-    return <StatusLine tone="loading">Checking WordPress.org for updates…</StatusLine>
+    return <StatusLine tone="loading">Checking for updates…</StatusLine>
   }
 
   return (
     <StatusLine tone="success">
       {updateCount > 0
-        ? `${pluralize(updateCount, 'update')} available on WordPress.org`
-        : 'All WordPress.org plugins are up to date'}
+        ? `${pluralize(updateCount, 'update')} available`
+        : 'All plugins are up to date'}
     </StatusLine>
   )
 }

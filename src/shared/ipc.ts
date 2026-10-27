@@ -5,6 +5,7 @@ import type {
   LocalModificationsRequest,
   NewProject,
   PluginModifications,
+  PluginReleaseQuery,
   PluginReleases,
   PluginScan,
   PluginUpdateProgress,
@@ -79,7 +80,7 @@ export type PluginPilotApi = {
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
-    getReleases: (slugs: string[]) => Promise<PluginReleases>
+    getReleases: (plugins: PluginReleaseQuery[]) => Promise<PluginReleases>
     getChangelog: (
       slug: string,
       fromVersion: string,

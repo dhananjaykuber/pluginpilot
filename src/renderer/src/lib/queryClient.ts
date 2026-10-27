@@ -1,4 +1,4 @@
-import type { PluginVersion } from '@shared/types'
+import type { PluginReleaseQuery, PluginVersion } from '@shared/types'
 import { focusManager, QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient()
@@ -32,7 +32,10 @@ export const queryKeys = {
   // Not under 'projects', so saving a project doesn't invalidate cached scans.
   projectPluginScans: (projectId: string) => ['plugin-scan', projectId],
   pluginScan: (projectId: string, branch: string) => ['plugin-scan', projectId, branch],
-  pluginReleases: (slugs: string[]) => ['plugin-releases', [...slugs].sort()],
+  pluginReleases: (plugins: PluginReleaseQuery[]) => [
+    'plugin-releases',
+    plugins.map(({ slug, packageName }) => `${slug}:${packageName ?? ''}`).sort()
+  ],
   projectUpdatePullRequests: (projectId: string) => ['update-pull-requests', projectId],
   updatePullRequests: (projectId: string, branch: string) => [
     'update-pull-requests',

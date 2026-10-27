@@ -92,15 +92,26 @@ export type PluginRequirements = {
   php: string | null
 }
 
+export type ReleaseSource = 'wordpress-org' | 'rtcamp'
+
+// The latest release of a plugin. rtCamp packages only provide the version: their downloads
+// need Composer credentials and they don't state a name or requirements.
 export type PluginRelease = {
   slug: string
-  name: string
+  source: ReleaseSource
+  name: string | null
   latestVersion: string
-  downloadUrl: string
-  requirements: PluginRequirements
+  downloadUrl: string | null
+  requirements: PluginRequirements | null
 }
 
-// Latest WordPress.org release per slug; null when the plugin isn't on WordPress.org.
+// What's needed to look up a plugin's latest release.
+export type PluginReleaseQuery = {
+  slug: string
+  packageName: string | null
+}
+
+// Latest release per slug; null when neither WordPress.org nor rtCamp packages have it.
 export type PluginReleases = Record<string, PluginRelease | null>
 
 export type PluginVersion = {

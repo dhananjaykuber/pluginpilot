@@ -2,6 +2,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
 import type {
   LocalModificationsRequest,
+  PluginReleaseQuery,
   PluginUpdateProgress,
   PluginUpdateRequest
 } from '../../shared/types'
@@ -9,14 +10,15 @@ import { findLocalModifications } from '../services/pluginModifications'
 import { scanProjectPlugins } from '../services/pluginScan'
 import { listUpdatePullRequests, updatePlugin } from '../services/pluginUpdate'
 import { chooseUploadedZip, type ExpectedPlugin } from '../services/uploadedZips'
-import { getPluginChangelog, getPluginReleases } from '../services/wordpressOrg'
+import { getPluginReleases } from '../services/pluginReleases'
+import { getPluginChangelog } from '../services/wordpressOrg'
 
 export function registerPluginHandlers(): void {
   ipcMain.handle(IpcChannels.pluginsScan, (_event, projectId: string, branch: string) =>
     scanProjectPlugins(projectId, branch)
   )
-  ipcMain.handle(IpcChannels.pluginsGetReleases, (_event, slugs: string[]) =>
-    getPluginReleases(slugs)
+  ipcMain.handle(IpcChannels.pluginsGetReleases, (_event, queries: PluginReleaseQuery[]) =>
+    getPluginReleases(queries)
   )
   ipcMain.handle(
     IpcChannels.pluginsGetChangelog,

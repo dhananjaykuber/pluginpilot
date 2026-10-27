@@ -22,7 +22,9 @@ type PluginsListProps = {
 export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Element {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<PluginFilter>('all')
-  const releases = usePluginReleases(scan.plugins.map((plugin) => plugin.slug))
+  const releases = usePluginReleases(
+    scan.plugins.map(({ slug, packageName }) => ({ slug, packageName }))
+  )
   const vulnerabilities = useVulnerabilities(
     scan.plugins.map(({ slug, version }) => ({ slug, version }))
   )

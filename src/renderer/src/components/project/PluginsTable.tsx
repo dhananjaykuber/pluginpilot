@@ -98,7 +98,7 @@ function PluginsTableFrame({ children, selectAll }: PluginsTableFrameProps): Rea
           <TableHead className="w-10">{selectAll}</TableHead>
           <TableHead>Name</TableHead>
           <TableHead className="w-32">Source</TableHead>
-          <TableHead className="w-56">Version</TableHead>
+          <TableHead className="w-72">Version</TableHead>
           <TableHead className="w-44">Known Vulnerabilities</TableHead>
           <TableHead className="w-32">Action</TableHead>
         </TableRow>

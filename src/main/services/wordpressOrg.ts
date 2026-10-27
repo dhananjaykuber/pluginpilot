@@ -1,11 +1,8 @@
-import type { ChangelogEntry, PluginRelease, PluginReleases } from '../../shared/types'
+import type { ChangelogEntry, PluginRelease } from '../../shared/types'
 import { parseChangelog, selectChangelogEntries } from './changelog'
-import { mapWithConcurrency } from './concurrency'
 import { decodeHtmlEntities } from './htmlEntities'
 
 const PLUGIN_INFO_URL = 'https://api.wordpress.org/plugins/info/1.2/'
-const REQUEST_CONCURRENCY = 8
-
 // Fields the plugin info API includes by default that PluginPilot doesn't use.
 // "sections" (description, changelog, …) is only requested for changelogs.
 const UNUSED_FIELDS = [
@@ -30,13 +27,6 @@ type PluginInfoResponse = {
   sections?: { changelog?: string }
 }
 
-export async function getPluginReleases(slugs: string[]): Promise<PluginReleases> {
-  const uniqueSlugs = [...new Set(slugs)]
-  const releases = await mapWithConcurrency(uniqueSlugs, REQUEST_CONCURRENCY, fetchPluginRelease)
-
-  return Object.fromEntries(uniqueSlugs.map((slug, index) => [slug, releases[index]]))
-}
-
 // Changelog entries for versions after `fromVersion`, up to and including `toVersion`.
 export async function getPluginChangelog(
   slug: string,
@@ -50,7 +40,7 @@ export async function getPluginChangelog(
 }
 
 // Returns null for plugins that aren't on WordPress.org, such as premium or custom plugins.
-async function fetchPluginRelease(slug: string): Promise<PluginRelease | null> {
+export async function fetchWordPressOrgRelease(slug: string): Promise<PluginRelease | null> {
   const info = await fetchPluginInfo(slug, { includeSections: false })
 
   if (!info) {
@@ -59,6 +49,7 @@ async function fetchPluginRelease(slug: string): Promise<PluginRelease | null> {
 
   return {
     slug,
+    source: 'wordpress-org',
     name: decodeHtmlEntities(info.name),
     latestVersion: info.version,
     downloadUrl: info.download_link,

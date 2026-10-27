@@ -1,3 +1,4 @@
+import { PackageIcon } from 'lucide-react'
 import { isMajorUpdate } from '@shared/versions'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -45,7 +46,7 @@ export function PluginRow({
         </Badge>
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="font-mono text-sm">
             {plugin.version ?? <span className="text-muted-foreground">Unknown</span>}
           </span>
@@ -64,9 +65,7 @@ export function PluginRow({
                 Major
               </Badge>
             )}
-          {plugin.isOnWordPressOrg === false && (
-            <span className="text-xs text-muted-foreground">Not on WordPress.org</span>
-          )}
+          <ReleaseSourceLabel plugin={plugin} />
         </div>
       </TableCell>
       <TableCell>
@@ -81,4 +80,26 @@ export function PluginRow({
       </TableCell>
     </TableRow>
   )
+}
+
+// Only shown when the update doesn't come from WordPress.org, the usual source.
+function ReleaseSourceLabel({ plugin }: { plugin: PluginListItem }): React.JSX.Element | null {
+  if (plugin.releaseSource === 'rtcamp') {
+    return (
+      <Badge variant="outline" title="Latest version from packages.rtcamp.workers.dev">
+        <PackageIcon data-icon="inline-start" />
+        rtCamp packages
+      </Badge>
+    )
+  }
+
+  if (plugin.isOnWordPressOrg === false) {
+    return (
+      <Badge variant="outline" className="text-muted-foreground">
+        Not on WordPress.org
+      </Badge>
+    )
+  }
+
+  return null
 }
