@@ -6,6 +6,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { getEnvironmentColor } from '@/lib/environments'
+import { cn } from '@/lib/utils'
 
 type EnvironmentSelectProps = {
   environments: Environment[]
@@ -37,7 +39,10 @@ export function EnvironmentSelect({
 function EnvironmentLabel({ environment }: { environment: Environment }): React.JSX.Element {
   return (
     <span className="flex items-center gap-2">
-      <span className="size-2 rounded-full bg-emerald-500" aria-hidden />
+      <span
+        className={cn('size-2 rounded-full', getEnvironmentColor(environment.name).dot)}
+        aria-hidden
+      />
       {environment.name}
       <span className="font-mono text-xs text-muted-foreground">{environment.branch}</span>
     </span>

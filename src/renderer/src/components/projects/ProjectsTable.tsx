@@ -1,6 +1,5 @@
 import { Link } from 'react-router'
 import type { Project } from '@shared/types'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -10,6 +9,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { paths } from '@/lib/paths'
+import { EnvironmentBadge } from './EnvironmentBadge'
 
 type ProjectsTableProps = {
   projects: Project[]
@@ -38,9 +38,12 @@ export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Eleme
             <TableCell>
               <div className="flex flex-wrap gap-1">
                 {project.environments.map((environment) => (
-                  <Badge key={environment.name} variant="secondary">
-                    {environment.name}
-                  </Badge>
+                  <EnvironmentBadge
+                    key={environment.name}
+                    projectId={project.id}
+                    name={environment.name}
+                    branch={environment.branch}
+                  />
                 ))}
               </div>
             </TableCell>
