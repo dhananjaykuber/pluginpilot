@@ -17,7 +17,9 @@ const api: PluginPilotApi = {
     add: (project) => ipcRenderer.invoke(IpcChannels.projectsAdd, project),
     update: (projectId, changes) =>
       ipcRenderer.invoke(IpcChannels.projectsUpdate, projectId, changes),
-    delete: (projectId) => ipcRenderer.invoke(IpcChannels.projectsDelete, projectId)
+    delete: (projectId) => ipcRenderer.invoke(IpcChannels.projectsDelete, projectId),
+    exportAll: () => ipcRenderer.invoke(IpcChannels.projectsExport),
+    importAll: () => ipcRenderer.invoke(IpcChannels.projectsImport)
   },
   plugins: {
     scan: (projectId, branch) => ipcRenderer.invoke(IpcChannels.pluginsScan, projectId, branch),

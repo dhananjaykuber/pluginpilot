@@ -16,6 +16,16 @@ export type Project = {
 
 export type NewProject = Omit<Project, 'id' | 'createdAt'>
 
+export type ProjectExportResult = {
+  count: number
+  filePath: string
+}
+
+export type ProjectImportResult = {
+  imported: number
+  skipped: number
+}
+
 // The parts of a project that can be edited after it is added.
 export type ProjectChanges = Pick<Project, 'pluginPaths' | 'environments'>
 

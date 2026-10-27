@@ -11,6 +11,8 @@ import type {
   PluginVersion,
   Project,
   ProjectChanges,
+  ProjectExportResult,
+  ProjectImportResult,
   RepositorySetup,
   RepositorySummary,
   UpdatePullRequest,
@@ -27,6 +29,8 @@ export const IpcChannels = {
   projectsAdd: 'projects:add',
   projectsUpdate: 'projects:update',
   projectsDelete: 'projects:delete',
+  projectsExport: 'projects:export',
+  projectsImport: 'projects:import',
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsGetChangelog: 'plugins:get-changelog',
@@ -56,6 +60,9 @@ export type PluginPilotApi = {
     add: (project: NewProject) => Promise<Project>
     update: (projectId: string, changes: ProjectChanges) => Promise<Project>
     delete: (projectId: string) => Promise<void>
+    // Both resolve to null when the user cancels the file dialog.
+    exportAll: () => Promise<ProjectExportResult | null>
+    importAll: () => Promise<ProjectImportResult | null>
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
