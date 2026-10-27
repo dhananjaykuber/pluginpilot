@@ -1,13 +1,14 @@
 import { CircleCheckIcon, CircleIcon, Loader2Icon } from 'lucide-react'
-import type { PluginUpdateStep } from '@shared/types'
-import { updateStepLabels, updateSteps } from '@/lib/pluginUpdate'
+import type { PluginSource, PluginUpdateStep } from '@shared/types'
+import { getUpdateStepLabel, updateSteps } from '@/lib/pluginUpdate'
 import { cn } from '@/lib/utils'
 
 type UpdateProgressProps = {
   currentStep: PluginUpdateStep | null
+  source: PluginSource
 }
 
-export function UpdateProgress({ currentStep }: UpdateProgressProps): React.JSX.Element {
+export function UpdateProgress({ currentStep, source }: UpdateProgressProps): React.JSX.Element {
   // Before the first progress event arrives, the first step is in progress.
   const currentIndex = currentStep ? updateSteps.indexOf(currentStep) : 0
 
@@ -32,7 +33,7 @@ export function UpdateProgress({ currentStep }: UpdateProgressProps): React.JSX.
                 index < currentIndex && 'text-emerald-600 dark:text-emerald-500'
               )}
             />
-            {updateStepLabels[step]}
+            {getUpdateStepLabel(step, source)}
           </li>
         )
       })}

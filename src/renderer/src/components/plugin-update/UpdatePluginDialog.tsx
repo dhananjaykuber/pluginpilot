@@ -108,7 +108,7 @@ function UpdateDialogBody({
   }
 
   if (updatePlugin.isPending) {
-    return <UpdateProgress currentStep={updatePlugin.step} />
+    return <UpdateProgress currentStep={updatePlugin.step} source={update.source} />
   }
 
   return <UpdateSummary update={update} baseBranch={baseBranch} />

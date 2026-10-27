@@ -1,5 +1,6 @@
 import type {
   Environment,
+  PluginSource,
   PluginUpdateRequest,
   PluginUpdateStep,
   PluginVulnerability
@@ -12,28 +13,42 @@ export type UpdateTarget = {
   environment: Environment
 }
 
-export type NewPluginUpdate = Omit<PluginUpdateRequest, 'updateId'>
+// Omit applied to each member of a union, so each update variant keeps its own fields.
+type DistributiveOmit<T, Key extends PropertyKey> = T extends unknown ? Omit<T, Key> : never
 
-export const updateStepLabels: Record<PluginUpdateStep, string> = {
-  download: 'Downloading from WordPress.org',
-  commit: 'Committing the new version to a branch',
-  'pull-request': 'Opening the pull request'
+export type NewPluginUpdate = DistributiveOmit<PluginUpdateRequest, 'updateId'>
+
+export const updateSteps: PluginUpdateStep[] = ['prepare', 'commit', 'pull-request']
+
+const prepareLabels: Record<PluginSource, string> = {
+  manual: 'Downloading from WordPress.org',
+  composer: 'Updating composer.lock with Composer'
 }
 
-export const updateSteps = Object.keys(updateStepLabels) as PluginUpdateStep[]
+export function getUpdateStepLabel(step: PluginUpdateStep, source: PluginSource): string {
+  switch (step) {
+    case 'prepare':
+      return prepareLabels[source]
+    case 'commit':
+      return 'Committing the changes to a new branch'
+    case 'pull-request':
+      return 'Opening the pull request'
+  }
+}
 
-// Committed plugins with a newer WordPress.org release can be updated. Composer plugins come later.
+// Plugins with a newer WordPress.org release can be updated: committed plugins by replacing
+// their folder, Composer plugins through composer.lock.
 export function toPluginUpdate(
   plugin: PluginListItem,
   target: UpdateTarget
 ): NewPluginUpdate | null {
-  const { version, availableVersion, downloadUrl } = plugin
+  const { version, availableVersion, downloadUrl, packageName } = plugin
 
-  if (plugin.source !== 'manual' || !version || !availableVersion || !downloadUrl) {
+  if (!version || !availableVersion) {
     return null
   }
 
-  return {
+  const details = {
     projectId: target.projectId,
     environmentName: target.environment.name,
     slug: plugin.slug,
@@ -41,11 +56,23 @@ export function toPluginUpdate(
     path: plugin.path,
     fromVersion: version,
     toVersion: availableVersion,
-    downloadUrl,
+    changelogUrl: plugin.isOnWordPressOrg
+      ? `https://wordpress.org/plugins/${plugin.slug}/#developers`
+      : null,
     securityFixes: (plugin.vulnerabilities ?? [])
       .filter((vulnerability) => isFixedBy(vulnerability, availableVersion))
       .map(({ title, cve }) => ({ title, cve }))
   }
+
+  if (plugin.source === 'composer' && packageName) {
+    return { ...details, source: 'composer', packageName }
+  }
+
+  if (plugin.source === 'manual' && downloadUrl) {
+    return { ...details, source: 'manual', downloadUrl }
+  }
+
+  return null
 }
 
 // A vulnerability is fixed when one of its patched versions is at or below the target version.

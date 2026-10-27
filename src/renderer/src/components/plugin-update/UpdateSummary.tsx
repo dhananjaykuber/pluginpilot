@@ -34,10 +34,22 @@ export function UpdateSummary({ update, baseBranch }: UpdateSummaryProps): React
         <dd>
           <code>{getUpdateBranchName(update.slug, update.toVersion)}</code>
         </dd>
-        <dt className="text-muted-foreground">Folder</dt>
-        <dd>
-          <code>{update.path}</code>
-        </dd>
+        {update.source === 'composer' ? (
+          <>
+            <dt className="text-muted-foreground">Package</dt>
+            <dd>
+              <code>{update.packageName}</code>
+              <span className="text-muted-foreground"> · composer.json and composer.lock</span>
+            </dd>
+          </>
+        ) : (
+          <>
+            <dt className="text-muted-foreground">Folder</dt>
+            <dd>
+              <code>{update.path}</code>
+            </dd>
+          </>
+        )}
       </dl>
     </div>
   )
