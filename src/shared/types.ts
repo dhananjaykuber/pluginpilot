@@ -11,7 +11,6 @@ export type Project = {
   }
   pluginPaths: string[]
   environments: Environment[]
-  localPath?: string
   createdAt: string
 }
 
