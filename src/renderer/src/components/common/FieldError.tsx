@@ -7,5 +7,5 @@ export function FieldError({ message }: FieldErrorProps): React.JSX.Element | nu
     return null
   }
 
-  return <p className="text-sm text-destructive">{message}</p>
+  return <p className="text-sm whitespace-pre-line text-destructive">{message}</p>
 }

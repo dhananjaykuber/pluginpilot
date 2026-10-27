@@ -91,8 +91,8 @@ function ItemStatus({
       )
     case 'failed':
       return (
-        <p className="flex items-center gap-1.5 text-xs text-destructive">
-          <CircleXIcon className="size-3.5 shrink-0" />
+        <p className="flex items-start gap-1.5 text-xs whitespace-pre-line text-destructive">
+          <CircleXIcon className="mt-px size-3.5 shrink-0" />
           {state.error}
         </p>
       )
