@@ -82,8 +82,6 @@ Then PluginPilot creates the branch `plugin-update/<base-branch>/<slug>-<version
 
 ![Create PR dialog](docs/images/create-pr.png)
 
-![Local changes warning](docs/images/create-pr.png)
-
 ![Pull request created by PluginPilot](docs/images/pull-request.png)
 
 ### Bulk pull requests
