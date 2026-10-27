@@ -7,5 +7,12 @@ export const queryKeys = {
   githubUser: ['auth', 'user'],
   projects: ['projects'],
   repositories: ['repositories'],
-  repositorySetup: (fullName: string, branch: string) => ['repositories', fullName, 'setup', branch]
+  repositorySetup: (fullName: string, branch: string) => [
+    'repositories',
+    fullName,
+    'setup',
+    branch
+  ],
+  // Not under 'projects', so saving a project doesn't invalidate cached scans.
+  pluginScan: (projectId: string, branch: string) => ['plugin-scan', projectId, branch]
 } as const

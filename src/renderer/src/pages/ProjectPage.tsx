@@ -1,8 +1,13 @@
 import { useParams } from 'react-router'
-import { FolderXIcon, PuzzleIcon } from 'lucide-react'
+import { FolderXIcon } from 'lucide-react'
+import type { Project } from '@shared/types'
 import { PageHeader } from '@/components/common/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
+import { EnvironmentSelect } from '@/components/project/EnvironmentSelect'
+import { PluginsPanel } from '@/components/project/PluginsPanel'
+import { ScanButton } from '@/components/project/ScanButton'
 import { useProject } from '@/hooks/useProject'
+import { useSelectedEnvironment } from '@/hooks/useSelectedEnvironment'
 import { paths } from '@/lib/paths'
 
 export function ProjectPage(): React.JSX.Element | null {
@@ -23,6 +28,11 @@ export function ProjectPage(): React.JSX.Element | null {
     )
   }
 
+  return <ProjectPlugins project={project} />
+}
+
+function ProjectPlugins({ project }: { project: Project }): React.JSX.Element {
+  const { environment, selectEnvironment } = useSelectedEnvironment(project)
   const fullName = `${project.repo.owner}/${project.repo.name}`
 
   return (
@@ -32,15 +42,21 @@ export function ProjectPage(): React.JSX.Element | null {
         description="All installed plugins for this environment, known vulnerabilities, and available updates."
         breadcrumbs={[
           { label: 'Projects', to: paths.projects },
-          { label: fullName },
+          { label: `${fullName} (${environment.name})` },
           { label: 'Plugins' }
         ]}
+        actions={
+          <>
+            <EnvironmentSelect
+              environments={project.environments}
+              value={environment}
+              onChange={selectEnvironment}
+            />
+            <ScanButton projectId={project.id} branch={environment.branch} />
+          </>
+        }
       />
-      <EmptyState
-        icon={PuzzleIcon}
-        title="No plugins scanned yet"
-        description="The plugin list for the selected environment will appear here."
-      />
+      <PluginsPanel key={environment.branch} projectId={project.id} branch={environment.branch} />
     </>
   )
 }
