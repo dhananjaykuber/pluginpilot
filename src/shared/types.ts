@@ -23,6 +23,25 @@ export type RepositorySummary = {
   ownerAvatarUrl: string
 }
 
+export type PluginFolder = {
+  path: string
+  pluginCount: number
+}
+
+export type ComposerSetup = {
+  hasLock: boolean
+  isValid: boolean
+  pluginPackageCount: number
+  installerPath: string | null
+}
+
+export type RepositorySetup = {
+  branch: string
+  pluginFolders: PluginFolder[]
+  composer: ComposerSetup | null
+  branches: string[]
+}
+
 export type GitHubUser = {
   login: string
   name: string

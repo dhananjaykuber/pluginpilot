@@ -15,7 +15,9 @@ const api: PluginPilotApi = {
     list: () => ipcRenderer.invoke(IpcChannels.projectsList)
   },
   repositories: {
-    list: () => ipcRenderer.invoke(IpcChannels.repositoriesList)
+    list: () => ipcRenderer.invoke(IpcChannels.repositoriesList),
+    detectSetup: (owner, repo, branch) =>
+      ipcRenderer.invoke(IpcChannels.repositoriesDetectSetup, owner, repo, branch)
   }
 }
 

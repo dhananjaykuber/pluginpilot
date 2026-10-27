@@ -23,5 +23,13 @@ export async function fetchGitHubUser(token: string): Promise<GitHubUser> {
 }
 
 export function isUnauthorizedError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'status' in error && error.status === 401
+  return hasHttpStatus(error, 401)
+}
+
+export function isNotFoundError(error: unknown): boolean {
+  return hasHttpStatus(error, 404)
+}
+
+function hasHttpStatus(error: unknown, status: number): boolean {
+  return typeof error === 'object' && error !== null && 'status' in error && error.status === status
 }

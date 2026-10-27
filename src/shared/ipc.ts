@@ -1,4 +1,4 @@
-import type { GitHubUser, Project, RepositorySummary } from './types'
+import type { GitHubUser, Project, RepositorySetup, RepositorySummary } from './types'
 
 export const IpcChannels = {
   appGetVersion: 'app:get-version',
@@ -6,7 +6,8 @@ export const IpcChannels = {
   authConnect: 'auth:connect',
   authDisconnect: 'auth:disconnect',
   projectsList: 'projects:list',
-  repositoriesList: 'repositories:list'
+  repositoriesList: 'repositories:list',
+  repositoriesDetectSetup: 'repositories:detect-setup'
 } as const
 
 export type PluginPilotApi = {
@@ -23,5 +24,6 @@ export type PluginPilotApi = {
   }
   repositories: {
     list: () => Promise<RepositorySummary[]>
+    detectSetup: (owner: string, repo: string, branch: string) => Promise<RepositorySetup>
   }
 }
