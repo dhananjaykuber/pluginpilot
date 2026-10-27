@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { ProjectsPage } from '@/pages/ProjectsPage'
 import { AddProjectPage } from '@/pages/AddProjectPage'
 import { ProjectPage } from '@/pages/ProjectPage'
+import { ProjectSettingsPage } from '@/pages/ProjectSettingsPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 
 export function AppRoutes(): React.JSX.Element {
@@ -12,6 +13,7 @@ export function AppRoutes(): React.JSX.Element {
         <Route index element={<ProjectsPage />} />
         <Route path="projects/new" element={<AddProjectPage />} />
         <Route path="projects/:projectId" element={<ProjectPage />} />
+        <Route path="projects/:projectId/settings" element={<ProjectSettingsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>

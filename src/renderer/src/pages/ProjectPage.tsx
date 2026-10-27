@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { EnvironmentSelect } from '@/components/project/EnvironmentSelect'
 import { PluginsPanel } from '@/components/project/PluginsPanel'
 import { ScanButton } from '@/components/project/ScanButton'
+import { ProjectSettingsButton } from '@/components/project/ProjectSettingsButton'
 import { useProject } from '@/hooks/useProject'
 import { useSelectedEnvironment } from '@/hooks/useSelectedEnvironment'
 import { paths } from '@/lib/paths'
@@ -53,6 +54,7 @@ function ProjectPlugins({ project }: { project: Project }): React.JSX.Element {
               onChange={selectEnvironment}
             />
             <ScanButton projectId={project.id} branch={environment.branch} />
+            <ProjectSettingsButton projectId={project.id} />
           </>
         }
       />

@@ -1,4 +1,10 @@
-import type { NewProject, RepositorySetup, RepositorySummary } from '@shared/types'
+import type {
+  NewProject,
+  Project,
+  ProjectChanges,
+  RepositorySetup,
+  RepositorySummary
+} from '@shared/types'
 
 export type EnvironmentDraft = {
   id: string
@@ -81,8 +87,24 @@ export function hasProjectFormErrors(errors: ProjectFormErrors): boolean {
 export function toNewProject(values: ProjectFormValues, repository: RepositorySummary): NewProject {
   return {
     repo: { owner: repository.owner, name: repository.name },
+    ...toProjectChanges(values)
+  }
+}
+
+export function toProjectChanges(values: ProjectFormValues): ProjectChanges {
+  return {
     pluginPaths: values.pluginPaths.map((draft) => normalizePath(draft.path)).filter(Boolean),
     environments: values.environments.map(({ name, branch }) => ({ name: name.trim(), branch }))
+  }
+}
+
+export function projectToFormValues(project: Project): ProjectFormValues {
+  return {
+    pluginPaths: project.pluginPaths.map((path) => ({ id: createDraftId(), path })),
+    environments: project.environments.map((environment) => ({
+      id: createDraftId(),
+      ...environment
+    }))
   }
 }
 

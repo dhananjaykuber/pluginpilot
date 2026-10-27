@@ -15,6 +15,7 @@ export const queryKeys = {
     branch
   ],
   // Not under 'projects', so saving a project doesn't invalidate cached scans.
+  projectPluginScans: (projectId: string) => ['plugin-scan', projectId],
   pluginScan: (projectId: string, branch: string) => ['plugin-scan', projectId, branch],
   pluginReleases: (slugs: string[]) => ['plugin-releases', [...slugs].sort()],
   projectUpdatePullRequests: (projectId: string) => ['update-pull-requests', projectId],
