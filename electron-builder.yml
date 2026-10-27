@@ -22,11 +22,18 @@ nsis:
   createDesktopShortcut: always
 mac:
   target: dmg
+  # Ad-hoc sign the whole bundle ("-"): there's no Developer ID, and without a complete signature
+  # macOS reports a downloaded app as "damaged" instead of offering Open Anyway.
+  identity: '-'
+  # The hardened runtime is only needed for notarization, which needs a Developer ID. With an
+  # ad-hoc signature it can stop Electron's frameworks from loading.
+  hardenedRuntime: false
   entitlementsInherit: build/entitlements.mac.plist
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
-  # bzip2 compression: a smaller download than the default, at the cost of a slower first open.
+  # bzip2 here; `npm run build:mac` then converts it to LZMA (ULMO, macOS 10.15+), which is
+  # smaller still but isn't a format electron-builder accepts.
   format: UDBZ
 linux:
   target:
