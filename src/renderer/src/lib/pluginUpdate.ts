@@ -73,6 +73,20 @@ export function toPluginUpdate(
   return null
 }
 
+// Plugins that can be updated automatically and don't have an open pull request yet,
+// by slug. These are the ones that can be selected for bulk pull requests.
+export function getBulkUpdates(
+  plugins: PluginListItem[],
+  target: UpdateTarget
+): Map<string, NewPluginUpdate> {
+  return new Map(
+    plugins.flatMap((plugin) => {
+      const update = plugin.pullRequest ? null : toPluginUpdate(plugin, target)
+      return update ? [[plugin.slug, update] as const] : []
+    })
+  )
+}
+
 // Committed plugins that aren't on WordPress.org, such as premium plugins, are updated from
 // a zip the user downloads from the vendor.
 export function canUpdateFromZip(plugin: PluginListItem): boolean {

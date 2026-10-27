@@ -1,5 +1,6 @@
 import { isMajorUpdate } from '@shared/versions'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, shortenPluginName, type PluginListItem } from '@/lib/plugins'
 import type { UpdateTarget } from '@/lib/pluginUpdate'
@@ -9,11 +10,29 @@ import { VulnerabilityBadge } from './VulnerabilityBadge'
 type PluginRowProps = {
   plugin: PluginListItem
   target: UpdateTarget
+  isSelectable: boolean
+  isSelected: boolean
+  onToggle: () => void
 }
 
-export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element {
+export function PluginRow({
+  plugin,
+  target,
+  isSelectable,
+  isSelected,
+  onToggle
+}: PluginRowProps): React.JSX.Element {
   return (
-    <TableRow>
+    <TableRow data-state={isSelected ? 'selected' : undefined}>
+      <TableCell>
+        {isSelectable && (
+          <Checkbox
+            aria-label={`Select ${plugin.displayName}`}
+            checked={isSelected}
+            onCheckedChange={onToggle}
+          />
+        )}
+      </TableCell>
       <TableCell>
         <p className="font-medium" title={plugin.displayName}>
           {shortenPluginName(plugin.displayName)}

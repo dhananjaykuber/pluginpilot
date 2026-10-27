@@ -2,10 +2,12 @@ import { useState } from 'react'
 import type { PluginScan } from '@shared/types'
 import { usePluginReleases } from '@/hooks/usePluginReleases'
 import { useRecordScanSummary } from '@/hooks/useScanSummaries'
+import { usePluginSelection } from '@/hooks/usePluginSelection'
 import { useUpdatePullRequests } from '@/hooks/useUpdatePullRequests'
 import { useVulnerabilities } from '@/hooks/useVulnerabilities'
 import { filterPlugins, toPluginListItems, type PluginFilter } from '@/lib/plugins'
-import type { UpdateTarget } from '@/lib/pluginUpdate'
+import { getBulkUpdates, type UpdateTarget } from '@/lib/pluginUpdate'
+import { BulkActionBar } from './BulkActionBar'
 import { PluginFilterMenu } from './PluginFilterMenu'
 import { PluginsTable } from './PluginsTable'
 import { PluginsToolbar } from './PluginsToolbar'
@@ -34,6 +36,9 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
     pullRequests.data
   )
   const visibleItems = filterPlugins(items, search, filter)
+  const bulkUpdates = getBulkUpdates(items, target)
+  const selection = usePluginSelection([...bulkUpdates.keys()])
+  const selectedUpdates = selection.selectedSlugs.flatMap((slug) => bulkUpdates.get(slug) ?? [])
   const updateCount = items.filter((item) => item.availableVersion).length
   const vulnerablePluginCount = items.filter((item) => item.vulnerabilities?.length).length
   const hasFinishedChecks = releases.isSuccess && vulnerabilities.isSuccess
@@ -75,8 +80,14 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
           onRetry={() => vulnerabilities.refetch()}
         />
       </div>
+      <BulkActionBar updates={selectedUpdates} target={target} onClear={selection.clear} />
       {visibleItems.length > 0 ? (
-        <PluginsTable plugins={visibleItems} target={target} />
+        <PluginsTable
+          plugins={visibleItems}
+          target={target}
+          selection={selection}
+          selectableSlugs={new Set(bulkUpdates.keys())}
+        />
       ) : (
         <p className="py-10 text-center text-sm text-muted-foreground">
           No plugins match the current filter and search.
