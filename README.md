@@ -10,6 +10,7 @@ PluginPilot works entirely through the GitHub API. It never clones your reposito
 
 - [Features](#features)
 - [Requirements](#requirements)
+- [Installing](#installing)
 - [Getting started](#getting-started)
 - [Connecting GitHub](#connecting-github)
 - [Adding a Wordfence API key](#adding-a-wordfence-api-key)
@@ -149,6 +150,29 @@ Choose **Light**, **Dark** or **System** from the account menu (your avatar, top
 - Optional: a free **Wordfence Intelligence API key**, for vulnerability checks
 - Optional: **PHP** and **Composer**, only to update Composer-managed plugins
 - For development: **Node.js 22+** and npm
+
+## Installing
+
+1. Download `pluginpilot-<version>.dmg` from the [latest release](https://github.com/dhananjaykuber/pluginpilot/releases/latest).
+2. Open it and drag **PluginPilot** into **Applications**.
+3. Open PluginPilot from Applications.
+
+PluginPilot isn't signed with an Apple Developer ID yet, so the first time you open it macOS says *"Apple could not verify "PluginPilot" is free of malware…"*. This happens once:
+
+1. In the dialog, click **Done**. Don't choose **Move to Bin**.
+
+   ![macOS could not verify PluginPilot](docs/images/install-gatekeeper.png)
+
+2. Open **System Settings → Privacy & Security**.
+3. Scroll down to the line saying "PluginPilot" was blocked, and click **Open Anyway**.
+
+   ![Open Anyway in Privacy & Security](docs/images/install-open-anyway.png)
+
+4. Confirm with your Mac password or Touch ID, then click **Open**.
+
+After that, PluginPilot opens normally. You can also skip the dialog by running `xattr -cr /Applications/PluginPilot.app` in Terminal once.
+
+New versions are announced in the app with a banner, and installed the same way.
 
 ## Getting started
 
