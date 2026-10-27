@@ -4,5 +4,6 @@ export const queryClient = new QueryClient()
 
 export const queryKeys = {
   appVersion: ['app', 'version'],
+  githubUser: ['auth', 'user'],
   projects: ['projects']
 } as const

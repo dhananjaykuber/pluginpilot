@@ -1,6 +1,6 @@
 import { AppLogo } from './AppLogo'
 import { TopNav } from './TopNav'
-import { UserAvatar } from '@/components/common/UserAvatar'
+import { UserMenu } from './UserMenu'
 
 export function TopBar(): React.JSX.Element {
   return (
@@ -8,7 +8,7 @@ export function TopBar(): React.JSX.Element {
       <AppLogo />
       <TopNav />
       <div className="ml-auto">
-        <UserAvatar size="sm" />
+        <UserMenu />
       </div>
     </header>
   )
