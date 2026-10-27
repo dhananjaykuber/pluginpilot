@@ -34,3 +34,39 @@ export function getPluginInstallerPath(composer: ComposerJson): string | null {
 
   return pluginEntry ? pluginEntry[0].replace(/\/?\{\$name\}\/?$/, '') : null
 }
+
+type ComposerLockPackage = {
+  name: string
+  version: string
+  type?: string
+}
+
+type ComposerLock = {
+  packages?: ComposerLockPackage[]
+  'packages-dev'?: ComposerLockPackage[]
+}
+
+export type LockedPlugin = {
+  packageName: string
+  slug: string
+  version: string
+}
+
+// WordPress plugins pinned in composer.lock, from wpackagist or any other repository.
+export function getLockedPlugins(lockContents: string): LockedPlugin[] {
+  let lock: ComposerLock
+
+  try {
+    lock = JSON.parse(lockContents) as ComposerLock
+  } catch {
+    throw new Error('composer.lock is not valid JSON.')
+  }
+
+  return [...(lock.packages ?? []), ...(lock['packages-dev'] ?? [])]
+    .filter((pkg) => pkg.type === 'wordpress-plugin')
+    .map((pkg) => ({
+      packageName: pkg.name,
+      slug: pkg.name.split('/').pop() ?? pkg.name,
+      version: pkg.version.replace(/^v(?=\d)/, '')
+    }))
+}
