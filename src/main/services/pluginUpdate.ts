@@ -59,7 +59,7 @@ export async function updatePlugin(
 
   const octokit = getAuthenticatedOctokit()
   const { owner, name: repo } = project.repo
-  const branch = getUpdateBranchName(request.slug, request.toVersion)
+  const branch = getUpdateBranchName(environment.branch, request.slug, request.toVersion)
   const title = buildUpdateTitle(request)
   const target: CommitTarget = {
     octokit,

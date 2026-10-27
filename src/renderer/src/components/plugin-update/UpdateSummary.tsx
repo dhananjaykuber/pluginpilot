@@ -35,7 +35,7 @@ export function UpdateSummary({
         </dd>
         <dt className="text-muted-foreground">New branch</dt>
         <dd>
-          <code>{getUpdateBranchName(update.slug, update.toVersion)}</code>
+          <code>{getUpdateBranchName(baseBranch, update.slug, update.toVersion)}</code>
         </dd>
         {update.source === 'composer' ? (
           <>
