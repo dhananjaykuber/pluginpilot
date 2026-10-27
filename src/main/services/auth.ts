@@ -22,15 +22,13 @@ export async function getCurrentUser(): Promise<GitHubUser | null> {
   }
 }
 
-export async function signInWithToken(token: string): Promise<GitHubUser> {
-  const user = await fetchGitHubUser(token)
-  saveGitHubToken(token)
-  return user
-}
-
 export async function connectGitHub(token: string): Promise<GitHubUser> {
+  const trimmedToken = token.trim()
+
   try {
-    return await signInWithToken(token.trim())
+    const user = await fetchGitHubUser(trimmedToken)
+    saveGitHubToken(trimmedToken)
+    return user
   } catch (error) {
     if (isUnauthorizedError(error)) {
       throw new Error('GitHub rejected this token. Check that it is correct and not expired.', {

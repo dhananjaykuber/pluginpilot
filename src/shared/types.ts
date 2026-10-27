@@ -20,9 +20,3 @@ export type GitHubUser = {
   name: string
   avatarUrl: string
 }
-
-export type DeviceCodePrompt = {
-  userCode: string
-  verificationUri: string
-  expiresAt: string
-}

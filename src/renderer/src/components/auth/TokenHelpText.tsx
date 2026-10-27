@@ -1,18 +1,19 @@
+import { ExternalLink } from '@/components/common/ExternalLink'
+
 const NEW_TOKEN_URL = 'https://github.com/settings/tokens/new?scopes=repo&description=PluginPilot'
 
 export function TokenHelpText(): React.JSX.Element {
   return (
-    <p className="text-xs text-muted-foreground">
-      <a
-        href={NEW_TOKEN_URL}
-        target="_blank"
-        rel="noreferrer"
-        className="font-medium text-foreground underline underline-offset-4"
-      >
-        Create a classic token
-      </a>{' '}
-      with the <code>repo</code> scope. Fine-grained tokens also work with Contents and Pull
-      requests set to read and write.
-    </p>
+    <ol className="list-decimal space-y-1 pl-4 text-xs text-muted-foreground">
+      <li>
+        <ExternalLink href={NEW_TOKEN_URL}>Create a classic token</ExternalLink> with the{' '}
+        <code>repo</code> scope. A 90-day expiration is recommended.
+      </li>
+      <li>
+        If your organizations use SSO, click <strong>Configure SSO</strong> next to the token and
+        authorize each organization.
+      </li>
+      <li>Paste the token below.</li>
+    </ol>
   )
 }

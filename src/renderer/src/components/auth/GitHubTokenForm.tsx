@@ -18,6 +18,7 @@ export function GitHubTokenForm(): React.JSX.Element {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <TokenHelpText />
       <div className="space-y-2">
         <Label htmlFor="github-token">Personal access token</Label>
         <Input
@@ -32,7 +33,6 @@ export function GitHubTokenForm(): React.JSX.Element {
         {connect.isError && (
           <p className="text-sm text-destructive">{getErrorMessage(connect.error)}</p>
         )}
-        <TokenHelpText />
       </div>
       <Button type="submit" className="w-full" disabled={!token.trim() || connect.isPending}>
         {connect.isPending && <Loader2Icon data-icon="inline-start" className="animate-spin" />}
