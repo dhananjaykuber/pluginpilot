@@ -1,12 +1,19 @@
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { HashRouter } from 'react-router'
+import { ThemeProvider } from 'next-themes'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/sonner'
+import { AppRoutes } from '@/routes'
 
 function App(): React.JSX.Element {
   return (
-    <div className="p-8 space-x-2">
-      <Button>Update</Button>
-      <Badge variant="destructive">1 Vulnerability</Badge>
-    </div>
+    <ThemeProvider attribute="class" defaultTheme="light">
+      <TooltipProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+        <Toaster />
+      </TooltipProvider>
+    </ThemeProvider>
   )
 }
 
