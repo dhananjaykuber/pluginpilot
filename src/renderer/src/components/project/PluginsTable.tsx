@@ -8,17 +8,19 @@ import {
   TableRow
 } from '@/components/ui/table'
 import type { PluginListItem } from '@/lib/plugins'
+import type { UpdateTarget } from '@/lib/pluginUpdate'
 import { PluginRow } from './PluginRow'
 
 type PluginsTableProps = {
   plugins: PluginListItem[]
+  target: UpdateTarget
 }
 
-export function PluginsTable({ plugins }: PluginsTableProps): React.JSX.Element {
+export function PluginsTable({ plugins, target }: PluginsTableProps): React.JSX.Element {
   return (
     <PluginsTableFrame>
       {plugins.map((plugin) => (
-        <PluginRow key={`${plugin.source}:${plugin.path}`} plugin={plugin} />
+        <PluginRow key={`${plugin.source}:${plugin.path}`} plugin={plugin} target={target} />
       ))}
     </PluginsTableFrame>
   )
@@ -42,6 +44,7 @@ export function PluginsTableSkeleton(): React.JSX.Element {
           <TableCell>
             <Skeleton className="h-5 w-16" />
           </TableCell>
+          <TableCell />
         </TableRow>
       ))}
     </PluginsTableFrame>
@@ -57,6 +60,7 @@ function PluginsTableFrame({ children }: { children: React.ReactNode }): React.J
           <TableHead className="w-32">Source</TableHead>
           <TableHead className="w-56">Version</TableHead>
           <TableHead className="w-44">Known Vulnerabilities</TableHead>
+          <TableHead className="w-28">Action</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>{children}</TableBody>

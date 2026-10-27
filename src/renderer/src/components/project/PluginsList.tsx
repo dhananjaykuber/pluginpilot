@@ -3,6 +3,7 @@ import type { PluginScan } from '@shared/types'
 import { usePluginReleases } from '@/hooks/usePluginReleases'
 import { useVulnerabilities } from '@/hooks/useVulnerabilities'
 import { filterPlugins, toPluginListItems } from '@/lib/plugins'
+import type { UpdateTarget } from '@/lib/pluginUpdate'
 import { PluginsTable } from './PluginsTable'
 import { PluginsToolbar } from './PluginsToolbar'
 import { ReleasesStatus } from './ReleasesStatus'
@@ -10,9 +11,10 @@ import { VulnerabilitiesStatus } from './VulnerabilitiesStatus'
 
 type PluginsListProps = {
   scan: PluginScan
+  target: UpdateTarget
 }
 
-export function PluginsList({ scan }: PluginsListProps): React.JSX.Element {
+export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Element {
   const [search, setSearch] = useState('')
   const releases = usePluginReleases(scan.plugins.map((plugin) => plugin.slug))
   const vulnerabilities = useVulnerabilities(
@@ -48,7 +50,7 @@ export function PluginsList({ scan }: PluginsListProps): React.JSX.Element {
         />
       </div>
       {visibleItems.length > 0 ? (
-        <PluginsTable plugins={visibleItems} />
+        <PluginsTable plugins={visibleItems} target={target} />
       ) : (
         <p className="py-10 text-center text-sm text-muted-foreground">
           No plugins match your search.

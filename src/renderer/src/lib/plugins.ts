@@ -16,6 +16,7 @@ export const pluginSourceLabels: Record<PluginSource, string> = {
 export type PluginListItem = InstalledPlugin & {
   displayName: string
   availableVersion: string | null
+  downloadUrl: string | null
   // null while WordPress.org hasn't been checked yet.
   isOnWordPressOrg: boolean | null
   // null until vulnerabilities have been checked, or when no Wordfence key is set.
@@ -35,6 +36,7 @@ export function toPluginListItems(
         ...plugin,
         displayName: getDisplayName(plugin, release),
         availableVersion: getAvailableVersion(plugin, release),
+        downloadUrl: release?.downloadUrl ?? null,
         isOnWordPressOrg: releases ? release !== null : null,
         vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null
       }

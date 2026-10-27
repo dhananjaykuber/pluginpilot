@@ -56,7 +56,7 @@ function ProjectPlugins({ project }: { project: Project }): React.JSX.Element {
           </>
         }
       />
-      <PluginsPanel key={environment.branch} projectId={project.id} branch={environment.branch} />
+      <PluginsPanel key={environment.branch} target={{ projectId: project.id, environment }} />
     </>
   )
 }

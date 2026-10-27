@@ -1,13 +1,18 @@
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
+import { toPluginUpdate, type UpdateTarget } from '@/lib/pluginUpdate'
+import { UpdatePluginButton } from '@/components/plugin-update/UpdatePluginButton'
 import { VulnerabilityBadge } from './VulnerabilityBadge'
 
 type PluginRowProps = {
   plugin: PluginListItem
+  target: UpdateTarget
 }
 
-export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
+export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element {
+  const update = toPluginUpdate(plugin, target)
+
   return (
     <TableRow>
       <TableCell>
@@ -40,6 +45,9 @@ export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
         ) : (
           <span className="text-muted-foreground">—</span>
         )}
+      </TableCell>
+      <TableCell>
+        {update && <UpdatePluginButton update={update} baseBranch={target.environment.branch} />}
       </TableCell>
     </TableRow>
   )

@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/common/EmptyState'
 import { usePluginScan } from '@/hooks/usePluginScan'
 import { getErrorMessage } from '@/lib/errors'
+import type { UpdateTarget } from '@/lib/pluginUpdate'
 import { PluginsList } from './PluginsList'
 import { PluginsTableSkeleton } from './PluginsTable'
 
 type PluginsPanelProps = {
-  projectId: string
-  branch: string
+  target: UpdateTarget
 }
 
-export function PluginsPanel({ projectId, branch }: PluginsPanelProps): React.JSX.Element {
-  const scan = usePluginScan(projectId, branch)
+export function PluginsPanel({ target }: PluginsPanelProps): React.JSX.Element {
+  const { branch } = target.environment
+  const scan = usePluginScan(target.projectId, branch)
 
   if (scan.isPending) {
     return <PluginsTableSkeleton />
@@ -43,5 +44,5 @@ export function PluginsPanel({ projectId, branch }: PluginsPanelProps): React.JS
     )
   }
 
-  return <PluginsList scan={scan.data} />
+  return <PluginsList scan={scan.data} target={target} />
 }
