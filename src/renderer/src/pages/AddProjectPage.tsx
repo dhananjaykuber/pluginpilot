@@ -3,6 +3,7 @@ import type { RepositorySummary } from '@shared/types'
 import { PageHeader } from '@/components/common/PageHeader'
 import { RepositoryPicker } from '@/components/add-project/RepositoryPicker'
 import { DetectedSetupCard } from '@/components/add-project/DetectedSetupCard'
+import { ProjectConfiguration } from '@/components/add-project/ProjectConfiguration'
 import { paths } from '@/lib/paths'
 
 export function AddProjectPage(): React.JSX.Element {
@@ -17,7 +18,12 @@ export function AddProjectPage(): React.JSX.Element {
       />
       <div className="max-w-3xl space-y-6">
         <RepositoryPicker selected={repository} onSelect={setRepository} />
-        {repository && <DetectedSetupCard repository={repository} />}
+        {repository && (
+          <>
+            <DetectedSetupCard repository={repository} />
+            <ProjectConfiguration key={repository.fullName} repository={repository} />
+          </>
+        )}
       </div>
     </>
   )
