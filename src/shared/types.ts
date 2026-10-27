@@ -60,6 +60,16 @@ export type PluginScan = {
   plugins: InstalledPlugin[]
 }
 
+export type PluginRelease = {
+  slug: string
+  name: string
+  latestVersion: string
+  downloadUrl: string
+}
+
+// Latest WordPress.org release per slug; null when the plugin isn't on WordPress.org.
+export type PluginReleases = Record<string, PluginRelease | null>
+
 export type GitHubUser = {
   login: string
   name: string

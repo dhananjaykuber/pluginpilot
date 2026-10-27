@@ -1,6 +1,7 @@
 import type {
   GitHubUser,
   NewProject,
+  PluginReleases,
   PluginScan,
   Project,
   RepositorySetup,
@@ -15,6 +16,7 @@ export const IpcChannels = {
   projectsList: 'projects:list',
   projectsAdd: 'projects:add',
   pluginsScan: 'plugins:scan',
+  pluginsGetReleases: 'plugins:get-releases',
   repositoriesList: 'repositories:list',
   repositoriesDetectSetup: 'repositories:detect-setup'
 } as const
@@ -34,6 +36,7 @@ export type PluginPilotApi = {
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
+    getReleases: (slugs: string[]) => Promise<PluginReleases>
   }
   repositories: {
     list: () => Promise<RepositorySummary[]>
