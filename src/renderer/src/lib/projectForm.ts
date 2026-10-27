@@ -1,4 +1,4 @@
-import type { RepositorySetup } from '@shared/types'
+import type { NewProject, RepositorySetup, RepositorySummary } from '@shared/types'
 
 export type EnvironmentDraft = {
   id: string
@@ -67,6 +67,22 @@ export function validateProjectForm(
     pluginPaths: validatePluginPaths(values.pluginPaths, setup),
     environments: values.environments.length === 0 ? 'Add at least one environment.' : null,
     environmentRows: validateEnvironmentRows(values.environments, setup.branches)
+  }
+}
+
+export function hasProjectFormErrors(errors: ProjectFormErrors): boolean {
+  return (
+    errors.pluginPaths !== null ||
+    errors.environments !== null ||
+    Object.keys(errors.environmentRows).length > 0
+  )
+}
+
+export function toNewProject(values: ProjectFormValues, repository: RepositorySummary): NewProject {
+  return {
+    repo: { owner: repository.owner, name: repository.name },
+    pluginPaths: values.pluginPaths.map((draft) => normalizePath(draft.path)).filter(Boolean),
+    environments: values.environments.map(({ name, branch }) => ({ name: name.trim(), branch }))
   }
 }
 

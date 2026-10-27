@@ -1,7 +1,18 @@
+import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import type { RepositorySetup, RepositorySummary } from '@shared/types'
+import { useAddProject } from '@/hooks/useAddProject'
 import { useProjectForm } from '@/hooks/useProjectForm'
 import { useRepositorySetup } from '@/hooks/useRepositorySetup'
-import { createInitialProjectForm, validateProjectForm } from '@/lib/projectForm'
+import { getErrorMessage } from '@/lib/errors'
+import { paths } from '@/lib/paths'
+import {
+  createInitialProjectForm,
+  hasProjectFormErrors,
+  toNewProject,
+  validateProjectForm
+} from '@/lib/projectForm'
+import { AddProjectActions } from './AddProjectActions'
 import { EnvironmentsCard } from './EnvironmentsCard'
 import { PluginFoldersCard } from './PluginFoldersCard'
 
@@ -30,8 +41,19 @@ function ProjectConfigurationForm({
   repository,
   setup
 }: ProjectConfigurationFormProps): React.JSX.Element {
+  const navigate = useNavigate()
+  const addProject = useAddProject()
   const form = useProjectForm(() => createInitialProjectForm(setup, repository.defaultBranch))
   const errors = validateProjectForm(form.values, setup)
+
+  function handleSave(): void {
+    addProject.mutate(toNewProject(form.values, repository), {
+      onSuccess: (project) => {
+        toast.success(`${repository.fullName} added`)
+        navigate(paths.project(project.id))
+      }
+    })
+  }
 
   return (
     <>
@@ -51,6 +73,12 @@ function ProjectConfigurationForm({
         onAdd={form.addEnvironment}
         onChange={form.updateEnvironment}
         onRemove={form.removeEnvironment}
+      />
+      <AddProjectActions
+        disabled={hasProjectFormErrors(errors)}
+        isSaving={addProject.isPending}
+        error={addProject.isError ? getErrorMessage(addProject.error) : null}
+        onSave={handleSave}
       />
     </>
   )
