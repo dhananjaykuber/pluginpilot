@@ -12,9 +12,8 @@ import {
   toNewProject,
   validateProjectForm
 } from '@/lib/projectForm'
-import { AddProjectActions } from './AddProjectActions'
-import { EnvironmentsCard } from './EnvironmentsCard'
-import { PluginFoldersCard } from './PluginFoldersCard'
+import { FormActions } from '@/components/common/FormActions'
+import { ProjectFormFields } from './ProjectFormFields'
 
 type ProjectConfigurationProps = {
   repository: RepositorySummary
@@ -57,24 +56,10 @@ function ProjectConfigurationForm({
 
   return (
     <>
-      <PluginFoldersCard
-        paths={form.values.pluginPaths}
-        error={errors.pluginPaths}
-        usesComposer={setup.composer !== null}
-        onAdd={form.addPluginPath}
-        onChange={form.updatePluginPath}
-        onRemove={form.removePluginPath}
-      />
-      <EnvironmentsCard
-        environments={form.values.environments}
-        branches={setup.branches}
-        error={errors.environments}
-        rowErrors={errors.environmentRows}
-        onAdd={form.addEnvironment}
-        onChange={form.updateEnvironment}
-        onRemove={form.removeEnvironment}
-      />
-      <AddProjectActions
+      <ProjectFormFields form={form} errors={errors} setup={setup} />
+      <FormActions
+        saveLabel="Add Project"
+        cancelTo={paths.projects}
         disabled={hasProjectFormErrors(errors)}
         isSaving={addProject.isPending}
         error={addProject.isError ? getErrorMessage(addProject.error) : null}
