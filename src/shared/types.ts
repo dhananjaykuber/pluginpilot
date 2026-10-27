@@ -70,6 +70,32 @@ export type PluginRelease = {
 // Latest WordPress.org release per slug; null when the plugin isn't on WordPress.org.
 export type PluginReleases = Record<string, PluginRelease | null>
 
+export type PluginVersion = {
+  slug: string
+  version: string | null
+}
+
+export type VulnerabilitySeverity = 'critical' | 'high' | 'medium' | 'low' | 'none'
+
+export type PluginVulnerability = {
+  id: string
+  title: string
+  severity: VulnerabilitySeverity | null
+  cvssScore: number | null
+  cve: string | null
+  patchedVersions: string[]
+  url: string | null
+}
+
+export type VulnerabilityReport = {
+  feedUpdatedAt: string
+  bySlug: Record<string, PluginVulnerability[]>
+}
+
+export type AppSettings = {
+  hasWordfenceKey: boolean
+}
+
 export type GitHubUser = {
   login: string
   name: string

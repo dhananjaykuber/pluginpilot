@@ -1,11 +1,14 @@
 import type {
+  AppSettings,
   GitHubUser,
   NewProject,
   PluginReleases,
   PluginScan,
+  PluginVersion,
   Project,
   RepositorySetup,
-  RepositorySummary
+  RepositorySummary,
+  VulnerabilityReport
 } from './types'
 
 export const IpcChannels = {
@@ -18,7 +21,11 @@ export const IpcChannels = {
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   repositoriesList: 'repositories:list',
-  repositoriesDetectSetup: 'repositories:detect-setup'
+  repositoriesDetectSetup: 'repositories:detect-setup',
+  settingsGet: 'settings:get',
+  settingsSetWordfenceKey: 'settings:set-wordfence-key',
+  settingsClearWordfenceKey: 'settings:clear-wordfence-key',
+  vulnerabilitiesCheck: 'vulnerabilities:check'
 } as const
 
 export type PluginPilotApi = {
@@ -41,5 +48,14 @@ export type PluginPilotApi = {
   repositories: {
     list: () => Promise<RepositorySummary[]>
     detectSetup: (owner: string, repo: string, branch: string) => Promise<RepositorySetup>
+  }
+  settings: {
+    get: () => Promise<AppSettings>
+    setWordfenceKey: (apiKey: string) => Promise<AppSettings>
+    clearWordfenceKey: () => Promise<AppSettings>
+  }
+  vulnerabilities: {
+    // Resolves to null when no Wordfence API key is configured.
+    check: (plugins: PluginVersion[]) => Promise<VulnerabilityReport | null>
   }
 }

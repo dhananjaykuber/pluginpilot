@@ -23,6 +23,14 @@ const api: PluginPilotApi = {
     list: () => ipcRenderer.invoke(IpcChannels.repositoriesList),
     detectSetup: (owner, repo, branch) =>
       ipcRenderer.invoke(IpcChannels.repositoriesDetectSetup, owner, repo, branch)
+  },
+  settings: {
+    get: () => ipcRenderer.invoke(IpcChannels.settingsGet),
+    setWordfenceKey: (apiKey) => ipcRenderer.invoke(IpcChannels.settingsSetWordfenceKey, apiKey),
+    clearWordfenceKey: () => ipcRenderer.invoke(IpcChannels.settingsClearWordfenceKey)
+  },
+  vulnerabilities: {
+    check: (plugins) => ipcRenderer.invoke(IpcChannels.vulnerabilitiesCheck, plugins)
   }
 }
 
