@@ -1,4 +1,6 @@
 import type { Octokit } from '@octokit/rest'
+import { UPDATE_BRANCH_PREFIX } from '../../shared/pluginUpdate'
+import type { UpdatePullRequest } from '../../shared/types'
 import { isUnprocessableError } from './github'
 
 type NewBranch = {
@@ -34,6 +36,30 @@ export async function createBranch(octokit: Octokit, newBranch: NewBranch): Prom
 
     throw error
   }
+}
+
+// Open pull requests created by PluginPilot (or following its branch naming) against `base`.
+export async function listOpenUpdatePullRequests(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  base: string
+): Promise<UpdatePullRequest[]> {
+  const pullRequests = await octokit.paginate(octokit.rest.pulls.list, {
+    owner,
+    repo,
+    base,
+    state: 'open',
+    per_page: 100
+  })
+
+  return pullRequests
+    .filter((pullRequest) => pullRequest.head.ref.startsWith(UPDATE_BRANCH_PREFIX))
+    .map((pullRequest) => ({
+      number: pullRequest.number,
+      url: pullRequest.html_url,
+      branch: pullRequest.head.ref
+    }))
 }
 
 export async function createPullRequest(

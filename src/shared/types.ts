@@ -119,6 +119,12 @@ export type PluginUpdateResult = {
   pullRequestUrl: string
 }
 
+export type UpdatePullRequest = {
+  number: number
+  url: string
+  branch: string
+}
+
 export type AppSettings = {
   hasWordfenceKey: boolean
 }

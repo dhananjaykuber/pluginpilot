@@ -19,6 +19,8 @@ const api: PluginPilotApi = {
   plugins: {
     scan: (projectId, branch) => ipcRenderer.invoke(IpcChannels.pluginsScan, projectId, branch),
     getReleases: (slugs) => ipcRenderer.invoke(IpcChannels.pluginsGetReleases, slugs),
+    listUpdatePullRequests: (projectId, baseBranch) =>
+      ipcRenderer.invoke(IpcChannels.pluginsListUpdatePullRequests, projectId, baseBranch),
     update: (request) => ipcRenderer.invoke(IpcChannels.pluginsUpdate, request),
     onUpdateProgress: (listener) => {
       const handleProgress = (_event: IpcRendererEvent, progress: PluginUpdateProgress): void =>

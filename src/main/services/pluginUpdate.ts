@@ -1,11 +1,25 @@
 import { getUpdateBranchName } from '../../shared/pluginUpdate'
-import type { PluginUpdateRequest, PluginUpdateResult, PluginUpdateStep } from '../../shared/types'
+import type {
+  PluginUpdateRequest,
+  PluginUpdateResult,
+  PluginUpdateStep,
+  UpdatePullRequest
+} from '../../shared/types'
 import { getAuthenticatedOctokit } from './github'
 import { commitFolderReplacement } from './githubTree'
 import { downloadPluginZip, extractPluginFiles, readPluginVersion } from './pluginZip'
 import { getProject } from './projects'
 import { buildUpdateBody, buildUpdateTitle } from './pullRequestContent'
-import { createBranch, createPullRequest } from './pullRequests'
+import { createBranch, createPullRequest, listOpenUpdatePullRequests } from './pullRequests'
+
+export function listUpdatePullRequests(
+  projectId: string,
+  baseBranch: string
+): Promise<UpdatePullRequest[]> {
+  const { owner, name: repo } = getProject(projectId).repo
+
+  return listOpenUpdatePullRequests(getAuthenticatedOctokit(), owner, repo, baseBranch)
+}
 
 // Replaces a committed plugin folder with the new version and opens a pull request
 // against the environment's branch.
