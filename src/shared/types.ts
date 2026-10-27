@@ -16,6 +16,9 @@ export type Project = {
 
 export type NewProject = Omit<Project, 'id' | 'createdAt'>
 
+// The parts of a project that can be edited after it is added.
+export type ProjectChanges = Pick<Project, 'pluginPaths' | 'environments'>
+
 export type RepositorySummary = {
   owner: string
   name: string

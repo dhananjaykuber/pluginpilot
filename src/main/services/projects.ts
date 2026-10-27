@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import type { NewProject, Project } from '../../shared/types'
+import type { NewProject, Project, ProjectChanges } from '../../shared/types'
 import { store } from '../store'
 
 export function listProjects(): Project[] {
@@ -30,4 +30,23 @@ export function addProject(input: NewProject): Project {
   store.set('projects', [...projects, project])
 
   return project
+}
+
+export function updateProject(projectId: string, changes: ProjectChanges): Project {
+  const updated: Project = { ...getProject(projectId), ...changes }
+
+  store.set(
+    'projects',
+    listProjects().map((project) => (project.id === projectId ? updated : project))
+  )
+
+  return updated
+}
+
+// Only removes the project from PluginPilot; nothing changes on GitHub.
+export function deleteProject(projectId: string): void {
+  store.set(
+    'projects',
+    listProjects().filter((project) => project.id !== projectId)
+  )
 }

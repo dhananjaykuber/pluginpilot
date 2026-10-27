@@ -9,6 +9,7 @@ import type {
   PluginUpdateResult,
   PluginVersion,
   Project,
+  ProjectChanges,
   RepositorySetup,
   RepositorySummary,
   UpdatePullRequest,
@@ -23,6 +24,8 @@ export const IpcChannels = {
   authDisconnect: 'auth:disconnect',
   projectsList: 'projects:list',
   projectsAdd: 'projects:add',
+  projectsUpdate: 'projects:update',
+  projectsDelete: 'projects:delete',
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsListUpdatePullRequests: 'plugins:list-update-pull-requests',
@@ -49,6 +52,8 @@ export type PluginPilotApi = {
   projects: {
     list: () => Promise<Project[]>
     add: (project: NewProject) => Promise<Project>
+    update: (projectId: string, changes: ProjectChanges) => Promise<Project>
+    delete: (projectId: string) => Promise<void>
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
