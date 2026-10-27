@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { sortEnvironments } from '@/lib/environments'
 import { paths } from '@/lib/paths'
 import { EnvironmentBadge } from './EnvironmentBadge'
 
@@ -37,7 +38,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Eleme
             <TableCell className="text-muted-foreground">{project.repo.owner}</TableCell>
             <TableCell>
               <div className="flex flex-wrap gap-1">
-                {project.environments.map((environment) => (
+                {sortEnvironments(project.environments).map((environment) => (
                   <EnvironmentBadge
                     key={environment.name}
                     projectId={project.id}

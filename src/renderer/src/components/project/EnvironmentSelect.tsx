@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { getEnvironmentColor } from '@/lib/environments'
+import { getEnvironmentColor, sortEnvironments } from '@/lib/environments'
 import { cn } from '@/lib/utils'
 
 type EnvironmentSelectProps = {
@@ -26,7 +26,7 @@ export function EnvironmentSelect({
         <SelectValue>{() => <EnvironmentLabel environment={value} />}</SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {environments.map((environment) => (
+        {sortEnvironments(environments).map((environment) => (
           <SelectItem key={environment.name} value={environment.name}>
             <EnvironmentLabel environment={environment} />
           </SelectItem>

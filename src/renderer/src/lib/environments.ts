@@ -37,30 +37,46 @@ const COLORS = {
   }
 } satisfies Record<string, EnvironmentColor>
 
-// Common environment names always get the same color, matching the usual dev → prod order.
-const KNOWN_ENVIRONMENT_COLORS: Record<string, EnvironmentColor> = {
-  development: COLORS.blue,
-  develop: COLORS.blue,
-  dev: COLORS.blue,
-  staging: COLORS.amber,
-  stage: COLORS.amber,
-  preprod: COLORS.amber,
-  production: COLORS.emerald,
-  prod: COLORS.emerald,
-  live: COLORS.emerald
-}
+type EnvironmentStage = 'production' | 'staging' | 'development'
+
+// Stages in display order, each with its color and the names that mean it.
+const STAGES: { stage: EnvironmentStage; color: EnvironmentColor; names: string[] }[] = [
+  { stage: 'production', color: COLORS.emerald, names: ['production', 'prod', 'live'] },
+  { stage: 'staging', color: COLORS.amber, names: ['staging', 'stage', 'preprod'] },
+  { stage: 'development', color: COLORS.blue, names: ['development', 'develop', 'dev'] }
+]
 
 const OTHER_COLORS = [COLORS.violet, COLORS.pink, COLORS.cyan]
 
-// Other names get a color derived from the name, so it stays the same everywhere.
+// Common names always get their stage's color. Other names get a color derived from the
+// name, so it stays the same everywhere.
 export function getEnvironmentColor(name: string): EnvironmentColor {
-  const key = name.trim().toLowerCase()
-  const known = KNOWN_ENVIRONMENT_COLORS[key]
+  const known = findStage(name)
 
   if (known) {
-    return known
+    return known.color
   }
 
+  const key = normalizeName(name)
   const hash = [...key].reduce((total, character) => total + character.charCodeAt(0), 0)
   return OTHER_COLORS[hash % OTHER_COLORS.length]
+}
+
+// Production, staging and development first, then other environments in their saved order.
+export function sortEnvironments<T extends { name: string }>(environments: T[]): T[] {
+  return [...environments].sort((a, b) => getStageRank(a.name) - getStageRank(b.name))
+}
+
+function getStageRank(name: string): number {
+  const known = findStage(name)
+  return known ? STAGES.indexOf(known) : STAGES.length
+}
+
+function findStage(name: string): (typeof STAGES)[number] | undefined {
+  const key = normalizeName(name)
+  return STAGES.find(({ names }) => names.includes(key))
+}
+
+function normalizeName(name: string): string {
+  return name.trim().toLowerCase()
 }
