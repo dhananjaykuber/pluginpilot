@@ -11,6 +11,8 @@ export type Project = {
   }
   pluginPaths: string[]
   environments: Environment[]
+  // Added to every update pull request. Missing on projects saved before labels existed.
+  labels?: string[]
   createdAt: string
 }
 
@@ -38,7 +40,7 @@ export type ProjectImportResult = {
 }
 
 // The parts of a project that can be edited after it is added.
-export type ProjectChanges = Pick<Project, 'pluginPaths' | 'environments'>
+export type ProjectChanges = Pick<Project, 'pluginPaths' | 'environments' | 'labels'>
 
 export type RepositorySummary = {
   owner: string

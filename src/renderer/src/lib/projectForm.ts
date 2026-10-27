@@ -20,6 +20,8 @@ export type PluginPathDraft = {
 export type ProjectFormValues = {
   pluginPaths: PluginPathDraft[]
   environments: EnvironmentDraft[]
+  // Comma-separated, e.g. "dependencies, plugins".
+  labels: string
 }
 
 export type ProjectFormErrors = {
@@ -47,7 +49,8 @@ export function createInitialProjectForm(
 
   return {
     pluginPaths: detectedPaths.map((path) => ({ id: createDraftId(), path })),
-    environments: suggestEnvironments(setup.branches, defaultBranch)
+    environments: suggestEnvironments(setup.branches, defaultBranch),
+    labels: ''
   }
 }
 
@@ -94,7 +97,8 @@ export function toNewProject(values: ProjectFormValues, repository: RepositorySu
 export function toProjectChanges(values: ProjectFormValues): ProjectChanges {
   return {
     pluginPaths: values.pluginPaths.map((draft) => normalizePath(draft.path)).filter(Boolean),
-    environments: values.environments.map(({ name, branch }) => ({ name: name.trim(), branch }))
+    environments: values.environments.map(({ name, branch }) => ({ name: name.trim(), branch })),
+    labels: parseLabels(values.labels)
   }
 }
 
@@ -104,8 +108,14 @@ export function projectToFormValues(project: Project): ProjectFormValues {
     environments: project.environments.map((environment) => ({
       id: createDraftId(),
       ...environment
-    }))
+    })),
+    labels: (project.labels ?? []).join(', ')
   }
+}
+
+// "dependencies, plugins, dependencies" → ["dependencies", "plugins"]
+function parseLabels(labels: string): string[] {
+  return [...new Set(labels.split(',').map((label) => label.trim()))].filter(Boolean)
 }
 
 function validatePluginPaths(paths: PluginPathDraft[], setup: RepositorySetup): string | null {

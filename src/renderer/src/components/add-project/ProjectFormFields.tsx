@@ -3,6 +3,7 @@ import type { useProjectForm } from '@/hooks/useProjectForm'
 import type { ProjectFormErrors } from '@/lib/projectForm'
 import { EnvironmentsCard } from './EnvironmentsCard'
 import { PluginFoldersCard } from './PluginFoldersCard'
+import { PullRequestLabelsCard } from './PullRequestLabelsCard'
 
 type ProjectFormFieldsProps = {
   form: ReturnType<typeof useProjectForm>
@@ -10,7 +11,7 @@ type ProjectFormFieldsProps = {
   setup: RepositorySetup
 }
 
-// Plugin folders and environments, shared by Add Project and project settings.
+// Plugin folders, environments and PR labels, shared by Add Project and project settings.
 export function ProjectFormFields({
   form,
   errors,
@@ -35,6 +36,7 @@ export function ProjectFormFields({
         onChange={form.updateEnvironment}
         onRemove={form.removeEnvironment}
       />
+      <PullRequestLabelsCard labels={form.values.labels} onChange={form.updateLabels} />
     </>
   )
 }

@@ -26,6 +26,10 @@ type ManualUpdate = Extract<PluginUpdateRequest, { source: 'manual' }>
 type ComposerUpdate = Extract<PluginUpdateRequest, { source: 'composer' }>
 type ProgressListener = (step: PluginUpdateStep) => void
 
+// Updates from a zip commit the plugin's own code, which isn't written to the repository's
+// coding standards, so the PHPCS scan is skipped for them.
+const SKIP_PHPCS_LABEL = 'skip-phpcs-scan'
+
 // Where the update commit goes: on top of the environment branch.
 type CommitTarget = {
   octokit: Octokit
@@ -81,10 +85,16 @@ export async function updatePlugin(
     head: branch,
     base: environment.branch,
     title: buildPullRequestTitle(request, environment.branch),
-    body: buildUpdateBody(request, environment.branch)
+    body: buildUpdateBody(request, environment.branch),
+    labels: getPullRequestLabels(project.labels ?? [], request)
   })
 
   return { branch, pullRequestNumber: pullRequest.number, pullRequestUrl: pullRequest.url }
+}
+
+function getPullRequestLabels(projectLabels: string[], request: PluginUpdateRequest): string[] {
+  const labels = request.source === 'manual' ? [...projectLabels, SKIP_PHPCS_LABEL] : projectLabels
+  return [...new Set(labels)]
 }
 
 // Replaces the committed plugin folder with the contents of the zip.

@@ -17,10 +17,11 @@ export function serializeProjects(projects: Project[]): string {
   const data: ProjectExport = {
     version: FORMAT_VERSION,
     exportedAt: new Date().toISOString(),
-    projects: projects.map(({ repo, pluginPaths, environments }) => ({
+    projects: projects.map(({ repo, pluginPaths, environments, labels }) => ({
       repo,
       pluginPaths,
-      environments
+      environments,
+      labels
     }))
   }
 
@@ -85,7 +86,14 @@ function parseProject(value: unknown, position: number): NewProject {
     return fail('environment names must be unique.')
   }
 
-  return { repo: { owner, name }, pluginPaths: value.pluginPaths, environments }
+  // Optional, so files exported before labels existed still import.
+  const labels = value.labels ?? []
+
+  if (!Array.isArray(labels) || !labels.every(isFilled)) {
+    return fail('labels must be a list of names.')
+  }
+
+  return { repo: { owner, name }, pluginPaths: value.pluginPaths, environments, labels }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

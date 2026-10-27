@@ -59,7 +59,11 @@ function EditProjectForm({ project, setup }: EditProjectFormProps): React.JSX.El
   const changes = toProjectChanges(form.values)
   const hasChanges =
     JSON.stringify(changes) !==
-    JSON.stringify({ pluginPaths: project.pluginPaths, environments: project.environments })
+    JSON.stringify({
+      pluginPaths: project.pluginPaths,
+      environments: project.environments,
+      labels: project.labels ?? []
+    })
 
   function handleSave(): void {
     updateProject.mutate(

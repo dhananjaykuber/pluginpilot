@@ -11,6 +11,7 @@ type ProjectForm = {
   addEnvironment: () => void
   updateEnvironment: (id: string, changes: EnvironmentChanges) => void
   removeEnvironment: (id: string) => void
+  updateLabels: (labels: string) => void
 }
 
 export function useProjectForm(createInitialValues: () => ProjectFormValues): ProjectForm {
@@ -40,6 +41,7 @@ export function useProjectForm(createInitialValues: () => ProjectFormValues): Pr
       setEnvironments((rows) => [...rows, { id: createDraftId(), name: '', branch: '' }]),
     updateEnvironment: (id, changes) =>
       setEnvironments((rows) => rows.map((row) => (row.id === id ? { ...row, ...changes } : row))),
-    removeEnvironment: (id) => setEnvironments((rows) => rows.filter((row) => row.id !== id))
+    removeEnvironment: (id) => setEnvironments((rows) => rows.filter((row) => row.id !== id)),
+    updateLabels: (labels) => setValues((current) => ({ ...current, labels }))
   }
 }
