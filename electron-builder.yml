@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: pluginpilot
+appId: com.pluginpilot.app
+productName: PluginPilot
 directories:
   buildResources: build
 files:
