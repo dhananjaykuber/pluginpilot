@@ -11,6 +11,7 @@ import {
 import { UserAvatar } from '@/components/common/UserAvatar'
 import { useGitHubUser } from '@/hooks/useGitHubUser'
 import { useDisconnectGitHub } from '@/hooks/useDisconnectGitHub'
+import { ThemeMenuItems } from './ThemeMenuItems'
 
 export function UserMenu(): React.JSX.Element | null {
   const { data: user } = useGitHubUser()
@@ -35,6 +36,8 @@ export function UserMenu(): React.JSX.Element | null {
             <span className="block font-normal">@{user.login}</span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <ThemeMenuItems />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => disconnect.mutate()}>
           <LogOutIcon />

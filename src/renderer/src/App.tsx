@@ -10,7 +10,7 @@ import { AppRoutes } from '@/routes'
 function App(): React.JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light">
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <TooltipProvider>
           <AuthGate>
             <HashRouter>

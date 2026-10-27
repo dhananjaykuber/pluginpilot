@@ -1,7 +1,22 @@
 import type { PluginVersion } from '@shared/types'
-import { QueryClient } from '@tanstack/react-query'
+import { focusManager, QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient()
+
+// TanStack Query refetches stale data when the page becomes visible, but switching apps
+// doesn't hide an Electron window. Use window focus instead, e.g. after merging a PR on GitHub.
+focusManager.setEventListener((setFocused) => {
+  const handleFocus = (): void => setFocused(true)
+  const handleBlur = (): void => setFocused(false)
+
+  window.addEventListener('focus', handleFocus)
+  window.addEventListener('blur', handleBlur)
+
+  return () => {
+    window.removeEventListener('focus', handleFocus)
+    window.removeEventListener('blur', handleBlur)
+  }
+})
 
 export const queryKeys = {
   appVersion: ['app', 'version'],
