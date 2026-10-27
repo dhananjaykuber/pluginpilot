@@ -55,11 +55,21 @@ function compareFiles(
   const modified: PluginFileChange[] = [...committed]
     .filter(([path, sha]) => original.has(path) && original.get(path) !== sha)
     .map(([path]) => ({ path, kind: 'modified' }))
-  const added: PluginFileChange[] = [...committed.keys()]
-    .filter((path) => !original.has(path))
+  const addedPaths = [...committed.keys()].filter((path) => !original.has(path))
+  const removedPaths = [...original.keys()].filter((path) => !committed.has(path))
+
+  // A file whose name only differs in letter case but has the same content isn't a hand-made
+  // change. It happens when a plugin renames a file and a case-insensitive Mac keeps the old name.
+  const sameFileKey = (path: string, sha: string | undefined): string =>
+    `${path.toLowerCase()}:${sha}`
+  const addedKeys = new Set(addedPaths.map((path) => sameFileKey(path, committed.get(path))))
+  const removedKeys = new Set(removedPaths.map((path) => sameFileKey(path, original.get(path))))
+
+  const added: PluginFileChange[] = addedPaths
+    .filter((path) => !removedKeys.has(sameFileKey(path, committed.get(path))))
     .map((path) => ({ path, kind: 'added' }))
-  const removed: PluginFileChange[] = [...original.keys()]
-    .filter((path) => !committed.has(path))
+  const removed: PluginFileChange[] = removedPaths
+    .filter((path) => !addedKeys.has(sameFileKey(path, original.get(path))))
     .map((path) => ({ path, kind: 'removed' }))
 
   return [...modified, ...added, ...removed]

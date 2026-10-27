@@ -31,9 +31,9 @@ type TextFileChanges = Repository & {
   message: string
 }
 
-// Keeps each create-tree request well under GitHub's request size limits.
-const MAX_BATCH_ENTRIES = 500
-const MAX_BATCH_BYTES = 5 * 1024 * 1024
+// Keeps each create-tree request small enough for GitHub to finish before its ~10s timeout.
+const MAX_BATCH_ENTRIES = 100
+const MAX_BATCH_BYTES = 1024 * 1024
 const BLOB_CONCURRENCY = 8
 
 // Creates a commit on top of `baseBranch` where `folderPath` contains exactly `files`.
@@ -178,15 +178,51 @@ async function createTreeInBatches(
   let treeSha = baseTreeSha
 
   for (const batch of splitIntoBatches(entries)) {
-    const { data: tree } = await octokit.rest.git.createTree({
-      ...repository,
-      base_tree: treeSha,
-      tree: batch
-    })
-    treeSha = tree.sha
+    treeSha = await createTree(octokit, repository, treeSha, batch)
   }
 
   return treeSha
+}
+
+// When GitHub still times out, the batch is split in half and each half is sent on its own.
+async function createTree(
+  octokit: Octokit,
+  repository: Repository,
+  baseTreeSha: string,
+  entries: TreeEntry[]
+): Promise<string> {
+  try {
+    const { data: tree } = await octokit.rest.git.createTree({
+      ...repository,
+      base_tree: baseTreeSha,
+      tree: entries
+    })
+    return tree.sha
+  } catch (error) {
+    if (entries.length < 2 || !isTimeoutError(error)) {
+      throw error
+    }
+
+    const middle = Math.ceil(entries.length / 2)
+    const firstHalfSha = await createTree(
+      octokit,
+      repository,
+      baseTreeSha,
+      entries.slice(0, middle)
+    )
+    return createTree(octokit, repository, firstHalfSha, entries.slice(middle))
+  }
+}
+
+// Either GitHub answers that it timed out, or the connection drops before it answers at all
+// (Octokit reports that as a 500 with a message such as "read ETIMEDOUT").
+function isTimeoutError(error: unknown): boolean {
+  const status = (error as { status?: number }).status
+  return (
+    status === 502 ||
+    status === 504 ||
+    /timed out|ETIMEDOUT|ECONNRESET|socket hang up/i.test(String(error))
+  )
 }
 
 function splitIntoBatches(entries: TreeEntry[]): TreeEntry[][] {
@@ -195,7 +231,7 @@ function splitIntoBatches(entries: TreeEntry[]): TreeEntry[][] {
   let batchBytes = 0
 
   for (const entry of entries) {
-    const entryBytes = entry.content?.length ?? 0
+    const entryBytes = entry.content ? Buffer.byteLength(entry.content) : 0
 
     if (batch.length >= MAX_BATCH_ENTRIES || batchBytes + entryBytes > MAX_BATCH_BYTES) {
       batches.push(batch)

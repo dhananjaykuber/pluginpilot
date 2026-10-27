@@ -82,9 +82,11 @@ export function PluginRow({
   )
 }
 
-// Only shown when the update doesn't come from WordPress.org, the usual source.
+// Only shown when the update doesn't come from WordPress.org, the usual source. Committed
+// plugins can also get their latest version from rtCamp packages, but they're still updated
+// from an uploaded zip, so they're only labelled as not being on WordPress.org.
 function ReleaseSourceLabel({ plugin }: { plugin: PluginListItem }): React.JSX.Element | null {
-  if (plugin.releaseSource === 'rtcamp') {
+  if (plugin.releaseSource === 'rtcamp' && plugin.source === 'composer') {
     return (
       <Badge variant="outline" title="Latest version from packages.rtcamp.workers.dev">
         <PackageIcon data-icon="inline-start" />
