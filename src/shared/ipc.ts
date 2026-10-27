@@ -15,8 +15,10 @@ import type {
   ProjectChanges,
   ProjectExportResult,
   ProjectImportResult,
+  ProjectScanSummaries,
   RepositorySetup,
   RepositorySummary,
+  ScanSummary,
   UpdatePullRequest,
   UploadedPluginZip,
   VulnerabilityReport
@@ -33,6 +35,8 @@ export const IpcChannels = {
   projectsDelete: 'projects:delete',
   projectsExport: 'projects:export',
   projectsImport: 'projects:import',
+  projectsListScanSummaries: 'projects:list-scan-summaries',
+  projectsSaveScanSummary: 'projects:save-scan-summary',
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsGetChangelog: 'plugins:get-changelog',
@@ -66,6 +70,12 @@ export type PluginPilotApi = {
     // Both resolve to null when the user cancels the file dialog.
     exportAll: () => Promise<ProjectExportResult | null>
     importAll: () => Promise<ProjectImportResult | null>
+    listScanSummaries: () => Promise<ProjectScanSummaries>
+    saveScanSummary: (
+      projectId: string,
+      environmentName: string,
+      summary: ScanSummary
+    ) => Promise<void>
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>

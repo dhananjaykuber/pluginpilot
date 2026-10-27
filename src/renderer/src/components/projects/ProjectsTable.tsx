@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import type { Project } from '@shared/types'
+import type { Project, ScanSummary } from '@shared/types'
 import {
   Table,
   TableBody,
@@ -8,7 +8,9 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { useScanSummaries } from '@/hooks/useScanSummaries'
 import { sortEnvironments } from '@/lib/environments'
+import { formatRelativeTime } from '@/lib/format'
 import { paths } from '@/lib/paths'
 import { EnvironmentBadge } from './EnvironmentBadge'
 
@@ -17,6 +19,8 @@ type ProjectsTableProps = {
 }
 
 export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Element {
+  const { data: summaries = {} } = useScanSummaries()
+
   return (
     <Table className="rounded-lg bg-background">
       <TableHeader>
@@ -24,7 +28,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Eleme
           <TableHead>Repository</TableHead>
           <TableHead>Organization</TableHead>
           <TableHead>Environments</TableHead>
-          <TableHead>Added</TableHead>
+          <TableHead>Last scanned</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -44,16 +48,25 @@ export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Eleme
                     projectId={project.id}
                     name={environment.name}
                     branch={environment.branch}
+                    summary={summaries[project.id]?.[environment.name]}
                   />
                 ))}
               </div>
             </TableCell>
             <TableCell className="text-muted-foreground">
-              {new Date(project.createdAt).toLocaleDateString()}
+              {formatLastScanned(Object.values(summaries[project.id] ?? {}))}
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
   )
+}
+
+function formatLastScanned(summaries: ScanSummary[]): string {
+  const latest = summaries
+    .map((summary) => summary.scannedAt)
+    .sort()
+    .at(-1)
+  return latest ? formatRelativeTime(latest) : 'Not scanned yet'
 }

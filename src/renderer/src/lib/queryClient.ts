@@ -40,6 +40,7 @@ export const queryKeys = {
     branch
   ],
   settings: ['settings'],
+  scanSummaries: ['scan-summaries'],
   vulnerabilities: ['vulnerabilities'],
   pluginVulnerabilities: (plugins: PluginVersion[]) => [
     'vulnerabilities',

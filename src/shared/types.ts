@@ -16,6 +16,17 @@ export type Project = {
 
 export type NewProject = Omit<Project, 'id' | 'createdAt'>
 
+export type ScanSummary = {
+  scannedAt: string
+  pluginCount: number
+  updateCount: number
+  // null when vulnerabilities weren't checked because no Wordfence key is set.
+  vulnerableCount: number | null
+}
+
+// Last scan summary by project ID, then by environment name.
+export type ProjectScanSummaries = Record<string, Record<string, ScanSummary>>
+
 export type ProjectExportResult = {
   count: number
   filePath: string

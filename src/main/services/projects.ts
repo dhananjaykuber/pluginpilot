@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { NewProject, Project, ProjectChanges } from '../../shared/types'
 import { store } from '../store'
+import { deleteScanSummaries } from './scanSummaries'
 
 export function listProjects(): Project[] {
   return store.get('projects')
@@ -49,4 +50,5 @@ export function deleteProject(projectId: string): void {
     'projects',
     listProjects().filter((project) => project.id !== projectId)
   )
+  deleteScanSummaries(projectId)
 }

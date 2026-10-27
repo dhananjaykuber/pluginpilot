@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PluginScan } from '@shared/types'
 import { usePluginReleases } from '@/hooks/usePluginReleases'
+import { useRecordScanSummary } from '@/hooks/useScanSummaries'
 import { useUpdatePullRequests } from '@/hooks/useUpdatePullRequests'
 import { useVulnerabilities } from '@/hooks/useVulnerabilities'
 import { filterPlugins, toPluginListItems, type PluginFilter } from '@/lib/plugins'
@@ -35,6 +36,19 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
   const visibleItems = filterPlugins(items, search, filter)
   const updateCount = items.filter((item) => item.availableVersion).length
   const vulnerablePluginCount = items.filter((item) => item.vulnerabilities?.length).length
+  const hasFinishedChecks = releases.isSuccess && vulnerabilities.isSuccess
+
+  useRecordScanSummary(
+    target,
+    hasFinishedChecks
+      ? {
+          scannedAt: scan.scannedAt,
+          pluginCount: items.length,
+          updateCount,
+          vulnerableCount: vulnerabilities.data ? vulnerablePluginCount : null
+        }
+      : null
+  )
 
   return (
     <div className="space-y-3">

@@ -1,8 +1,9 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
-import type { NewProject, ProjectChanges } from '../../shared/types'
+import type { NewProject, ProjectChanges, ScanSummary } from '../../shared/types'
 import { addProject, deleteProject, listProjects, updateProject } from '../services/projects'
 import { exportProjects, importProjects } from '../services/projectTransfer'
+import { listScanSummaries, saveScanSummary } from '../services/scanSummaries'
 
 export function registerProjectHandlers(): void {
   ipcMain.handle(IpcChannels.projectsList, () => listProjects())
@@ -18,5 +19,11 @@ export function registerProjectHandlers(): void {
   )
   ipcMain.handle(IpcChannels.projectsImport, (event) =>
     importProjects(BrowserWindow.fromWebContents(event.sender))
+  )
+  ipcMain.handle(IpcChannels.projectsListScanSummaries, () => listScanSummaries())
+  ipcMain.handle(
+    IpcChannels.projectsSaveScanSummary,
+    (_event, projectId: string, environmentName: string, summary: ScanSummary) =>
+      saveScanSummary(projectId, environmentName, summary)
   )
 }
