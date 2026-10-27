@@ -4,3 +4,8 @@ out
 .DS_Store
 .eslintcache
 *.log*
+
+# Brag launch video output and locally installed agent skills
+brag-output/
+.agents/
+skills-lock.json
