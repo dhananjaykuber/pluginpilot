@@ -3,6 +3,7 @@ import { useActiveSection } from '@/hooks/useActiveSection'
 import { navItems } from './navItems'
 import { SidebarLink } from './SidebarLink'
 import { SidebarProfile } from './SidebarProfile'
+import { SidebarFooter } from './SidebarFooter'
 
 export function Sidebar(): React.JSX.Element {
   const activeSection = useActiveSection()
@@ -16,6 +17,7 @@ export function Sidebar(): React.JSX.Element {
           <SidebarLink key={item.section} item={item} active={item.section === activeSection} />
         ))}
       </nav>
+      <SidebarFooter />
     </aside>
   )
 }
