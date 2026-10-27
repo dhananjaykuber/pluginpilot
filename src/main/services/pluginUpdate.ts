@@ -18,7 +18,7 @@ import {
   type PluginFile
 } from './pluginZip'
 import { getProject } from './projects'
-import { buildUpdateBody, buildUpdateTitle } from './pullRequestContent'
+import { buildPullRequestTitle, buildUpdateBody, buildUpdateTitle } from './pullRequestContent'
 import { createBranch, createPullRequest, listOpenUpdatePullRequests } from './pullRequests'
 import { readUploadedZip } from './uploadedZips'
 
@@ -60,13 +60,12 @@ export async function updatePlugin(
   const octokit = getAuthenticatedOctokit()
   const { owner, name: repo } = project.repo
   const branch = getUpdateBranchName(environment.branch, request.slug, request.toVersion)
-  const title = buildUpdateTitle(request)
   const target: CommitTarget = {
     octokit,
     owner,
     repo,
     baseBranch: environment.branch,
-    message: title
+    message: buildUpdateTitle(request)
   }
 
   const commitSha =
@@ -81,7 +80,7 @@ export async function updatePlugin(
     repo,
     head: branch,
     base: environment.branch,
-    title,
+    title: buildPullRequestTitle(request, environment.branch),
     body: buildUpdateBody(request, environment.branch)
   })
 

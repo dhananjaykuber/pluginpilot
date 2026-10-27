@@ -7,6 +7,11 @@ export function buildUpdateTitle(request: PluginUpdateRequest): string {
   return `Update ${request.name} from ${request.fromVersion} to ${request.toVersion}`
 }
 
+// "[develop] Update Yoast SEO from 28.7 to 28.8", so the PR list shows which environment it targets.
+export function buildPullRequestTitle(request: PluginUpdateRequest, baseBranch: string): string {
+  return `[${baseBranch}] ${buildUpdateTitle(request)}`
+}
+
 export function buildUpdateBody(request: PluginUpdateRequest, baseBranch: string): string {
   const sections = [
     '## Plugin update',
