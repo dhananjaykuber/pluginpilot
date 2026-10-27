@@ -1,11 +1,34 @@
-import type { InstalledPlugin, PluginSource } from '@shared/types'
+import type { InstalledPlugin, PluginRelease, PluginReleases, PluginSource } from '@shared/types'
+import { isNewerVersion } from '@shared/versions'
 
 export const pluginSourceLabels: Record<PluginSource, string> = {
   composer: 'Composer',
   manual: 'Manual'
 }
 
-export function filterPlugins(plugins: InstalledPlugin[], search: string): InstalledPlugin[] {
+export type PluginListItem = InstalledPlugin & {
+  displayName: string
+  availableVersion: string | null
+}
+
+export function toPluginListItems(
+  plugins: InstalledPlugin[],
+  releases: PluginReleases | undefined
+): PluginListItem[] {
+  return plugins
+    .map((plugin) => {
+      const release = releases?.[plugin.slug] ?? null
+
+      return {
+        ...plugin,
+        displayName: getDisplayName(plugin, release),
+        availableVersion: getAvailableVersion(plugin, release)
+      }
+    })
+    .sort((a, b) => a.displayName.localeCompare(b.displayName))
+}
+
+export function filterPlugins(plugins: PluginListItem[], search: string): PluginListItem[] {
   const query = search.trim().toLowerCase()
 
   if (!query) {
@@ -14,6 +37,22 @@ export function filterPlugins(plugins: InstalledPlugin[], search: string): Insta
 
   return plugins.filter(
     (plugin) =>
-      plugin.name.toLowerCase().includes(query) || plugin.slug.toLowerCase().includes(query)
+      plugin.displayName.toLowerCase().includes(query) || plugin.slug.toLowerCase().includes(query)
   )
+}
+
+// Composer plugins only know their slug, so use the WordPress.org name when there is one.
+function getDisplayName(plugin: InstalledPlugin, release: PluginRelease | null): string {
+  return plugin.source === 'composer' && release ? release.name : plugin.name
+}
+
+function getAvailableVersion(
+  plugin: InstalledPlugin,
+  release: PluginRelease | null
+): string | null {
+  if (!release || !plugin.version || !isNewerVersion(release.latestVersion, plugin.version)) {
+    return null
+  }
+
+  return release.latestVersion
 }

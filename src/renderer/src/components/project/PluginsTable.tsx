@@ -1,4 +1,3 @@
-import type { InstalledPlugin } from '@shared/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -8,10 +7,11 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import type { PluginListItem } from '@/lib/plugins'
 import { PluginRow } from './PluginRow'
 
 type PluginsTableProps = {
-  plugins: InstalledPlugin[]
+  plugins: PluginListItem[]
 }
 
 export function PluginsTable({ plugins }: PluginsTableProps): React.JSX.Element {
@@ -52,7 +52,7 @@ function PluginsTableFrame({ children }: { children: React.ReactNode }): React.J
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead className="w-32">Source</TableHead>
-          <TableHead className="w-40">Version</TableHead>
+          <TableHead className="w-56">Version</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>{children}</TableBody>

@@ -1,17 +1,16 @@
-import type { InstalledPlugin } from '@shared/types'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { pluginSourceLabels } from '@/lib/plugins'
+import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
 
 type PluginRowProps = {
-  plugin: InstalledPlugin
+  plugin: PluginListItem
 }
 
 export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
   return (
     <TableRow>
       <TableCell>
-        <p className="font-medium">{plugin.name}</p>
+        <p className="font-medium">{plugin.displayName}</p>
         <p className="font-mono text-xs text-muted-foreground">{plugin.path}</p>
       </TableCell>
       <TableCell>
@@ -19,8 +18,17 @@ export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
           {pluginSourceLabels[plugin.source]}
         </Badge>
       </TableCell>
-      <TableCell className="font-mono text-sm">
-        {plugin.version ?? <span className="text-muted-foreground">Unknown</span>}
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-sm">
+            {plugin.version ?? <span className="text-muted-foreground">Unknown</span>}
+          </span>
+          {plugin.availableVersion && (
+            <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              {plugin.availableVersion} Available
+            </Badge>
+          )}
+        </div>
       </TableCell>
     </TableRow>
   )
