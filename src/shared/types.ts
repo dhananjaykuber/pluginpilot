@@ -14,6 +14,8 @@ export type Project = {
   createdAt: string
 }
 
+export type NewProject = Omit<Project, 'id' | 'createdAt'>
+
 export type RepositorySummary = {
   owner: string
   name: string

@@ -12,7 +12,8 @@ const api: PluginPilotApi = {
     disconnect: () => ipcRenderer.invoke(IpcChannels.authDisconnect)
   },
   projects: {
-    list: () => ipcRenderer.invoke(IpcChannels.projectsList)
+    list: () => ipcRenderer.invoke(IpcChannels.projectsList),
+    add: (project) => ipcRenderer.invoke(IpcChannels.projectsAdd, project)
   },
   repositories: {
     list: () => ipcRenderer.invoke(IpcChannels.repositoriesList),
