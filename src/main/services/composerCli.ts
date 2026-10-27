@@ -17,16 +17,22 @@ const EXTRA_PATHS = [
 
 // Flags for every run: never prompt, never run project scripts or plugins, and don't let the
 // local PHP version block resolving versions for the project's server.
+// Enough of Composer's output to include the reason, e.g. "Problem 1 …".
+const ERROR_LINES = 8
+
 const SAFE_FLAGS = ['--no-interaction', '--no-scripts', '--no-plugins', '--ignore-platform-reqs']
 
-export async function runComposer(args: string[], cwd: string): Promise<void> {
+// Resolves to Composer's standard output.
+export async function runComposer(args: string[], cwd: string): Promise<string> {
   try {
-    await execFileAsync('composer', [...args, ...SAFE_FLAGS], {
+    const { stdout } = await execFileAsync('composer', [...args, ...SAFE_FLAGS], {
       cwd,
       timeout: COMMAND_TIMEOUT_MS,
       maxBuffer: 10 * 1024 * 1024,
       env: { ...process.env, PATH: [process.env.PATH, ...EXTRA_PATHS].join(delimiter) }
     })
+
+    return stdout
   } catch (error) {
     throw new Error(describeComposerError(error), { cause: error })
   }
@@ -42,7 +48,7 @@ function describeComposerError(error: unknown): string {
   }
 
   const stderr = 'stderr' in error && typeof error.stderr === 'string' ? error.stderr.trim() : ''
-  const lastLines = stderr.split('\n').slice(-5).join('\n')
+  const lastLines = stderr.split('\n').slice(-ERROR_LINES).join('\n')
 
   return lastLines ? `Composer failed:\n${lastLines}` : 'Composer failed.'
 }
