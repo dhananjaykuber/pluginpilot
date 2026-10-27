@@ -2,6 +2,7 @@ import type { Octokit } from '@octokit/rest'
 import { UPDATE_BRANCH_PREFIX } from '../../shared/pluginUpdate'
 import type { UpdatePullRequest } from '../../shared/types'
 import { isUnprocessableError } from './github'
+import { getChecksStatus, getReviewStatus } from './pullRequestStatus'
 
 type NewBranch = {
   owner: string
@@ -53,13 +54,26 @@ export async function listOpenUpdatePullRequests(
     per_page: 100
   })
 
-  return pullRequests
-    .filter((pullRequest) => pullRequest.head.ref.startsWith(UPDATE_BRANCH_PREFIX))
-    .map((pullRequest) => ({
-      number: pullRequest.number,
-      url: pullRequest.html_url,
-      branch: pullRequest.head.ref
-    }))
+  const updatePullRequests = pullRequests.filter((pullRequest) =>
+    pullRequest.head.ref.startsWith(UPDATE_BRANCH_PREFIX)
+  )
+
+  return Promise.all(
+    updatePullRequests.map(async (pullRequest) => {
+      const [checks, review] = await Promise.all([
+        getChecksStatus(octokit, { owner, repo, ref: pullRequest.head.sha }),
+        getReviewStatus(octokit, { owner, repo, pull_number: pullRequest.number })
+      ])
+
+      return {
+        number: pullRequest.number,
+        url: pullRequest.html_url,
+        branch: pullRequest.head.ref,
+        checks,
+        review
+      }
+    })
+  )
 }
 
 export async function createPullRequest(

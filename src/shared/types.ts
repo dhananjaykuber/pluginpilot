@@ -186,10 +186,16 @@ export type PluginUpdateResult = {
   pullRequestUrl: string
 }
 
+export type ChecksStatus = 'passing' | 'failing' | 'pending' | 'none'
+
+export type ReviewStatus = 'approved' | 'changes-requested' | 'pending'
+
 export type UpdatePullRequest = {
   number: number
   url: string
   branch: string
+  checks: ChecksStatus
+  review: ReviewStatus
 }
 
 export type AppSettings = {
