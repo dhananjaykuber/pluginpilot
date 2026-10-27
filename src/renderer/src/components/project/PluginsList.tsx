@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PluginScan } from '@shared/types'
 import { usePluginReleases } from '@/hooks/usePluginReleases'
+import { useUpdatePullRequests } from '@/hooks/useUpdatePullRequests'
 import { useVulnerabilities } from '@/hooks/useVulnerabilities'
 import { filterPlugins, toPluginListItems } from '@/lib/plugins'
 import type { UpdateTarget } from '@/lib/pluginUpdate'
@@ -21,7 +22,14 @@ export function PluginsList({ scan, target }: PluginsListProps): React.JSX.Eleme
     scan.plugins.map(({ slug, version }) => ({ slug, version }))
   )
 
-  const items = toPluginListItems(scan.plugins, releases.data, vulnerabilities.data)
+  const pullRequests = useUpdatePullRequests(target)
+
+  const items = toPluginListItems(
+    scan.plugins,
+    releases.data,
+    vulnerabilities.data,
+    pullRequests.data
+  )
   const visibleItems = filterPlugins(items, search)
   const updateCount = items.filter((item) => item.availableVersion).length
   const vulnerablePluginCount = items.filter((item) => item.vulnerabilities?.length).length

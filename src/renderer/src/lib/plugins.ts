@@ -4,8 +4,10 @@ import type {
   PluginReleases,
   PluginSource,
   PluginVulnerability,
+  UpdatePullRequest,
   VulnerabilityReport
 } from '@shared/types'
+import { findUpdatePullRequest } from '@shared/pluginUpdate'
 import { isNewerVersion } from '@shared/versions'
 
 export const pluginSourceLabels: Record<PluginSource, string> = {
@@ -21,12 +23,15 @@ export type PluginListItem = InstalledPlugin & {
   isOnWordPressOrg: boolean | null
   // null until vulnerabilities have been checked, or when no Wordfence key is set.
   vulnerabilities: PluginVulnerability[] | null
+  // An open pull request that already updates this plugin.
+  pullRequest: UpdatePullRequest | null
 }
 
 export function toPluginListItems(
   plugins: InstalledPlugin[],
   releases: PluginReleases | undefined,
-  vulnerabilities: VulnerabilityReport | null | undefined
+  vulnerabilities: VulnerabilityReport | null | undefined,
+  pullRequests: UpdatePullRequest[] | undefined
 ): PluginListItem[] {
   return plugins
     .map((plugin) => {
@@ -38,7 +43,8 @@ export function toPluginListItems(
         availableVersion: getAvailableVersion(plugin, release),
         downloadUrl: release?.downloadUrl ?? null,
         isOnWordPressOrg: releases ? release !== null : null,
-        vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null
+        vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null,
+        pullRequest: findUpdatePullRequest(pullRequests ?? [], plugin.slug)
       }
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName))

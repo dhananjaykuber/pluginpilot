@@ -3,6 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
 import { toPluginUpdate, type UpdateTarget } from '@/lib/pluginUpdate'
 import { UpdatePluginButton } from '@/components/plugin-update/UpdatePluginButton'
+import { PullRequestLink } from './PullRequestLink'
 import { VulnerabilityBadge } from './VulnerabilityBadge'
 
 type PluginRowProps = {
@@ -47,7 +48,11 @@ export function PluginRow({ plugin, target }: PluginRowProps): React.JSX.Element
         )}
       </TableCell>
       <TableCell>
-        {update && <UpdatePluginButton update={update} baseBranch={target.environment.branch} />}
+        {plugin.pullRequest ? (
+          <PullRequestLink pullRequest={plugin.pullRequest} />
+        ) : (
+          update && <UpdatePluginButton update={update} baseBranch={target.environment.branch} />
+        )}
       </TableCell>
     </TableRow>
   )
