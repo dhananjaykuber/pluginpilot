@@ -39,6 +39,9 @@ export function PluginsTableSkeleton(): React.JSX.Element {
           <TableCell>
             <Skeleton className="h-4 w-12" />
           </TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-16" />
+          </TableCell>
         </TableRow>
       ))}
     </PluginsTableFrame>
@@ -53,6 +56,7 @@ function PluginsTableFrame({ children }: { children: React.ReactNode }): React.J
           <TableHead>Name</TableHead>
           <TableHead className="w-32">Source</TableHead>
           <TableHead className="w-56">Version</TableHead>
+          <TableHead className="w-44">Known Vulnerabilities</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>{children}</TableBody>

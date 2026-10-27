@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { pluginSourceLabels, type PluginListItem } from '@/lib/plugins'
+import { VulnerabilityBadge } from './VulnerabilityBadge'
 
 type PluginRowProps = {
   plugin: PluginListItem
@@ -32,6 +33,13 @@ export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
             <span className="text-xs text-muted-foreground">Not on WordPress.org</span>
           )}
         </div>
+      </TableCell>
+      <TableCell>
+        {plugin.vulnerabilities?.length ? (
+          <VulnerabilityBadge vulnerabilities={plugin.vulnerabilities} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
       </TableCell>
     </TableRow>
   )

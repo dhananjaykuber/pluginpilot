@@ -1,4 +1,11 @@
-import type { InstalledPlugin, PluginRelease, PluginReleases, PluginSource } from '@shared/types'
+import type {
+  InstalledPlugin,
+  PluginRelease,
+  PluginReleases,
+  PluginSource,
+  PluginVulnerability,
+  VulnerabilityReport
+} from '@shared/types'
 import { isNewerVersion } from '@shared/versions'
 
 export const pluginSourceLabels: Record<PluginSource, string> = {
@@ -11,11 +18,14 @@ export type PluginListItem = InstalledPlugin & {
   availableVersion: string | null
   // null while WordPress.org hasn't been checked yet.
   isOnWordPressOrg: boolean | null
+  // null until vulnerabilities have been checked, or when no Wordfence key is set.
+  vulnerabilities: PluginVulnerability[] | null
 }
 
 export function toPluginListItems(
   plugins: InstalledPlugin[],
-  releases: PluginReleases | undefined
+  releases: PluginReleases | undefined,
+  vulnerabilities: VulnerabilityReport | null | undefined
 ): PluginListItem[] {
   return plugins
     .map((plugin) => {
@@ -25,7 +35,8 @@ export function toPluginListItems(
         ...plugin,
         displayName: getDisplayName(plugin, release),
         availableVersion: getAvailableVersion(plugin, release),
-        isOnWordPressOrg: releases ? release !== null : null
+        isOnWordPressOrg: releases ? release !== null : null,
+        vulnerabilities: vulnerabilities ? (vulnerabilities.bySlug[plugin.slug] ?? []) : null
       }
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName))

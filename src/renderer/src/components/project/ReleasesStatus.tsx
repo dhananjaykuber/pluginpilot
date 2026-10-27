@@ -1,5 +1,5 @@
-import { CircleAlertIcon, CircleCheckIcon, Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { StatusLine } from '@/components/common/StatusLine'
 import { getErrorMessage } from '@/lib/errors'
 import { pluralize } from '@/lib/format'
 
@@ -18,31 +18,24 @@ export function ReleasesStatus({
 }: ReleasesStatusProps): React.JSX.Element {
   if (error) {
     return (
-      <p className="flex items-center gap-2 text-sm text-destructive">
-        <CircleAlertIcon className="size-4" />
-        Couldn&apos;t check for updates: {getErrorMessage(error)}
+      <StatusLine tone="error">
+        Couldn&apos;t check for updates: {getErrorMessage(error)}{' '}
         <Button variant="link" size="sm" className="h-auto p-0" onClick={onRetry}>
           Try again
         </Button>
-      </p>
+      </StatusLine>
     )
   }
 
   if (isChecking) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2Icon className="size-4 animate-spin" />
-        Checking WordPress.org for updates…
-      </p>
-    )
+    return <StatusLine tone="loading">Checking WordPress.org for updates…</StatusLine>
   }
 
   return (
-    <p className="flex items-center gap-2 text-sm text-muted-foreground">
-      <CircleCheckIcon className="size-4" />
+    <StatusLine tone="success">
       {updateCount > 0
         ? `${pluralize(updateCount, 'update')} available on WordPress.org`
         : 'All WordPress.org plugins are up to date'}
-    </p>
+    </StatusLine>
   )
 }
