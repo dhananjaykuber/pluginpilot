@@ -21,6 +21,7 @@ const api: PluginPilotApi = {
     getReleases: (slugs) => ipcRenderer.invoke(IpcChannels.pluginsGetReleases, slugs),
     listUpdatePullRequests: (projectId, baseBranch) =>
       ipcRenderer.invoke(IpcChannels.pluginsListUpdatePullRequests, projectId, baseBranch),
+    chooseZip: (expected) => ipcRenderer.invoke(IpcChannels.pluginsChooseZip, expected),
     update: (request) => ipcRenderer.invoke(IpcChannels.pluginsUpdate, request),
     onUpdateProgress: (listener) => {
       const handleProgress = (_event: IpcRendererEvent, progress: PluginUpdateProgress): void =>

@@ -4,16 +4,23 @@ import type {
   PluginUpdateRequest,
   PluginUpdateResult,
   PluginUpdateStep,
+  PluginZipSource,
   UpdatePullRequest
 } from '../../shared/types'
 import { updateComposerPackage } from './composerUpdate'
 import { getAuthenticatedOctokit } from './github'
 import { readTextFile } from './githubContent'
 import { commitFolderReplacement, commitTextFiles } from './githubTree'
-import { downloadPluginZip, extractPluginFiles, readPluginVersion } from './pluginZip'
+import {
+  downloadPluginZip,
+  extractPluginFiles,
+  readPluginHeader,
+  type PluginFile
+} from './pluginZip'
 import { getProject } from './projects'
 import { buildUpdateBody, buildUpdateTitle } from './pullRequestContent'
 import { createBranch, createPullRequest, listOpenUpdatePullRequests } from './pullRequests'
+import { readUploadedZip } from './uploadedZips'
 
 type ManualUpdate = Extract<PluginUpdateRequest, { source: 'manual' }>
 type ComposerUpdate = Extract<PluginUpdateRequest, { source: 'composer' }>
@@ -81,19 +88,19 @@ export async function updatePlugin(
   return { branch, pullRequestNumber: pullRequest.number, pullRequestUrl: pullRequest.url }
 }
 
-// Replaces the committed plugin folder with the contents of the WordPress.org zip.
+// Replaces the committed plugin folder with the contents of the zip.
 async function commitManualUpdate(
   target: CommitTarget,
   request: ManualUpdate,
   onProgress: ProgressListener
 ): Promise<string> {
   onProgress('prepare')
-  const files = extractPluginFiles(await downloadPluginZip(request.downloadUrl))
-  const downloadedVersion = readPluginVersion(files)
+  const files = await readZip(request.zip)
+  const zipVersion = readPluginHeader(files)?.version
 
-  if (downloadedVersion !== request.toVersion) {
+  if (zipVersion !== request.toVersion) {
     throw new Error(
-      `The downloaded zip contains version ${downloadedVersion ?? 'unknown'}, expected ${request.toVersion}.`
+      `The zip contains version ${zipVersion ?? 'unknown'}, expected ${request.toVersion}.`
     )
   }
 
@@ -103,6 +110,12 @@ async function commitManualUpdate(
     folderPath: request.path,
     files
   })
+}
+
+async function readZip(zip: PluginZipSource): Promise<PluginFile[]> {
+  return zip.from === 'upload'
+    ? readUploadedZip(zip.zipId)
+    : extractPluginFiles(await downloadPluginZip(zip.url))
 }
 
 // Updates the package in composer.lock (and composer.json if needed). Plugin code isn't committed.

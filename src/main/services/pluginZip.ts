@@ -1,5 +1,5 @@
 import AdmZip from 'adm-zip'
-import { parsePluginHeader } from './pluginHeader'
+import { parsePluginHeader, type PluginHeader } from './pluginHeader'
 
 export type PluginFile = {
   // Relative to the plugin folder, e.g. "includes/class-safe-svg.php".
@@ -21,7 +21,7 @@ export async function downloadPluginZip(url: string): Promise<Buffer> {
 export function extractPluginFiles(zip: Buffer): PluginFile[] {
   const files = new AdmZip(zip)
     .getEntries()
-    .filter((entry) => !entry.isDirectory)
+    .filter((entry) => !entry.isDirectory && !isArchiveJunk(entry.entryName))
     .map((entry) => ({ path: entry.entryName, content: entry.getData() }))
 
   const rootFolder = getSharedRootFolder(files.map((file) => file.path))
@@ -33,8 +33,8 @@ export function extractPluginFiles(zip: Buffer): PluginFile[] {
   return files.map((file) => ({ ...file, path: file.path.slice(rootFolder.length + 1) }))
 }
 
-// Reads the version from the main plugin file: a top-level PHP file with a plugin header.
-export function readPluginVersion(files: PluginFile[]): string | null {
+// Reads the main plugin file's header: a top-level PHP file with a "Plugin Name" header.
+export function readPluginHeader(files: PluginFile[]): PluginHeader | null {
   for (const file of files) {
     if (file.path.includes('/') || !file.path.endsWith('.php')) {
       continue
@@ -43,7 +43,7 @@ export function readPluginVersion(files: PluginFile[]): string | null {
     const header = parsePluginHeader(file.content.toString('utf8'))
 
     if (header) {
-      return header.version
+      return header
     }
   }
 
@@ -58,4 +58,9 @@ function getSharedRootFolder(paths: string[]): string | null {
   }
 
   return firstFolder
+}
+
+// Files added by macOS when zipping in Finder, which don't belong in the plugin.
+function isArchiveJunk(path: string): boolean {
+  return path.startsWith('__MACOSX/') || path.split('/').pop() === '.DS_Store'
 }

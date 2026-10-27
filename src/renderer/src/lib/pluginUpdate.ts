@@ -1,9 +1,10 @@
 import type {
   Environment,
-  PluginSource,
+  PluginUpdateDetails,
   PluginUpdateRequest,
   PluginUpdateStep,
-  PluginVulnerability
+  PluginVulnerability,
+  UploadedPluginZip
 } from '@shared/types'
 import { compareVersions } from '@shared/versions'
 import type { PluginListItem } from './plugins'
@@ -20,20 +21,23 @@ export type NewPluginUpdate = DistributiveOmit<PluginUpdateRequest, 'updateId'>
 
 export const updateSteps: PluginUpdateStep[] = ['prepare', 'commit', 'pull-request']
 
-const prepareLabels: Record<PluginSource, string> = {
-  manual: 'Downloading from WordPress.org',
-  composer: 'Updating composer.lock with Composer'
-}
-
-export function getUpdateStepLabel(step: PluginUpdateStep, source: PluginSource): string {
+export function getUpdateStepLabel(step: PluginUpdateStep, update: NewPluginUpdate): string {
   switch (step) {
     case 'prepare':
-      return prepareLabels[source]
+      return getPrepareLabel(update)
     case 'commit':
       return 'Committing the changes to a new branch'
     case 'pull-request':
       return 'Opening the pull request'
   }
+}
+
+function getPrepareLabel(update: NewPluginUpdate): string {
+  if (update.source === 'composer') {
+    return 'Updating composer.lock with Composer'
+  }
+
+  return update.zip.from === 'upload' ? 'Reading the zip file' : 'Downloading from WordPress.org'
 }
 
 // Plugins with a newer WordPress.org release can be updated: committed plugins by replacing
@@ -49,19 +53,10 @@ export function toPluginUpdate(
   }
 
   const details = {
-    projectId: target.projectId,
-    environmentName: target.environment.name,
-    slug: plugin.slug,
-    name: plugin.displayName,
-    path: plugin.path,
-    fromVersion: version,
-    toVersion: availableVersion,
+    ...getUpdateDetails(plugin, target, version, availableVersion),
     changelogUrl: plugin.isOnWordPressOrg
       ? `https://wordpress.org/plugins/${plugin.slug}/#developers`
-      : null,
-    securityFixes: (plugin.vulnerabilities ?? [])
-      .filter((vulnerability) => isFixedBy(vulnerability, availableVersion))
-      .map(({ title, cve }) => ({ title, cve }))
+      : null
   }
 
   if (plugin.source === 'composer' && packageName) {
@@ -69,10 +64,49 @@ export function toPluginUpdate(
   }
 
   if (plugin.source === 'manual' && downloadUrl) {
-    return { ...details, source: 'manual', downloadUrl }
+    return { ...details, source: 'manual', zip: { from: 'wordpress-org', url: downloadUrl } }
   }
 
   return null
+}
+
+// Committed plugins that aren't on WordPress.org, such as premium plugins, are updated from
+// a zip the user downloads from the vendor.
+export function canUpdateFromZip(plugin: PluginListItem): boolean {
+  return plugin.source === 'manual' && plugin.isOnWordPressOrg === false && !!plugin.version
+}
+
+export function toZipUpdate(
+  plugin: PluginListItem,
+  target: UpdateTarget,
+  zip: UploadedPluginZip
+): NewPluginUpdate {
+  return {
+    ...getUpdateDetails(plugin, target, plugin.version ?? '', zip.version),
+    changelogUrl: null,
+    source: 'manual',
+    zip: { from: 'upload', zipId: zip.zipId }
+  }
+}
+
+function getUpdateDetails(
+  plugin: PluginListItem,
+  target: UpdateTarget,
+  fromVersion: string,
+  toVersion: string
+): Omit<PluginUpdateDetails, 'updateId' | 'changelogUrl'> {
+  return {
+    projectId: target.projectId,
+    environmentName: target.environment.name,
+    slug: plugin.slug,
+    name: plugin.displayName,
+    path: plugin.path,
+    fromVersion,
+    toVersion,
+    securityFixes: (plugin.vulnerabilities ?? [])
+      .filter((vulnerability) => isFixedBy(vulnerability, toVersion))
+      .map(({ title, cve }) => ({ title, cve }))
+  }
 }
 
 // A vulnerability is fixed when one of its patched versions is at or below the target version.

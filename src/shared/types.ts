@@ -94,7 +94,7 @@ export type VulnerabilityReport = {
   bySlug: Record<string, PluginVulnerability[]>
 }
 
-type PluginUpdateDetails = {
+export type PluginUpdateDetails = {
   // Lets the renderer match progress events to the update it started.
   updateId: string
   projectId: string
@@ -108,10 +108,21 @@ type PluginUpdateDetails = {
   securityFixes: { title: string; cve: string | null }[]
 }
 
-// Committed plugins are replaced with the downloaded zip; Composer plugins only change
+// Where a committed plugin's new version comes from: WordPress.org, or a zip the user chose.
+export type PluginZipSource =
+  { from: 'wordpress-org'; url: string } | { from: 'upload'; zipId: string }
+
+// Committed plugins are replaced with the zip's contents; Composer plugins only change
 // composer.json and composer.lock.
 export type PluginUpdateRequest = PluginUpdateDetails &
-  ({ source: 'manual'; downloadUrl: string } | { source: 'composer'; packageName: string })
+  ({ source: 'manual'; zip: PluginZipSource } | { source: 'composer'; packageName: string })
+
+// A zip the user chose, checked to contain a newer version of the expected plugin.
+export type UploadedPluginZip = {
+  zipId: string
+  name: string
+  version: string
+}
 
 export type PluginUpdateStep = 'prepare' | 'commit' | 'pull-request'
 

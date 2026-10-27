@@ -12,6 +12,7 @@ import type {
   RepositorySetup,
   RepositorySummary,
   UpdatePullRequest,
+  UploadedPluginZip,
   VulnerabilityReport
 } from './types'
 
@@ -25,6 +26,7 @@ export const IpcChannels = {
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsListUpdatePullRequests: 'plugins:list-update-pull-requests',
+  pluginsChooseZip: 'plugins:choose-zip',
   pluginsUpdate: 'plugins:update',
   pluginsUpdateProgress: 'plugins:update-progress',
   repositoriesList: 'repositories:list',
@@ -52,6 +54,8 @@ export type PluginPilotApi = {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
     getReleases: (slugs: string[]) => Promise<PluginReleases>
     listUpdatePullRequests: (projectId: string, baseBranch: string) => Promise<UpdatePullRequest[]>
+    // Resolves to null when the user cancels the file picker.
+    chooseZip: (expected: { name: string; version: string }) => Promise<UploadedPluginZip | null>
     update: (request: PluginUpdateRequest) => Promise<PluginUpdateResult>
     // Returns a function that stops listening.
     onUpdateProgress: (listener: (progress: PluginUpdateProgress) => void) => () => void

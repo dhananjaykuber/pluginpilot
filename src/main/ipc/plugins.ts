@@ -1,8 +1,9 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
 import type { PluginUpdateProgress, PluginUpdateRequest } from '../../shared/types'
 import { scanProjectPlugins } from '../services/pluginScan'
 import { listUpdatePullRequests, updatePlugin } from '../services/pluginUpdate'
+import { chooseUploadedZip, type ExpectedPlugin } from '../services/uploadedZips'
 import { getPluginReleases } from '../services/wordpressOrg'
 
 export function registerPluginHandlers(): void {
@@ -15,6 +16,9 @@ export function registerPluginHandlers(): void {
   ipcMain.handle(
     IpcChannels.pluginsListUpdatePullRequests,
     (_event, projectId: string, baseBranch: string) => listUpdatePullRequests(projectId, baseBranch)
+  )
+  ipcMain.handle(IpcChannels.pluginsChooseZip, (event, expected: ExpectedPlugin) =>
+    chooseUploadedZip(BrowserWindow.fromWebContents(event.sender), expected)
   )
   ipcMain.handle(IpcChannels.pluginsUpdate, (event, request: PluginUpdateRequest) =>
     updatePlugin(request, (step) => {
