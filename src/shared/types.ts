@@ -224,6 +224,14 @@ export type AppSettings = {
   hasWordfenceKey: boolean
 }
 
+// A newer PluginPilot release on GitHub.
+export type AppUpdate = {
+  version: string
+  releaseUrl: string
+  installerId: number
+  installerName: string
+}
+
 export type GitHubUser = {
   login: string
   name: string

@@ -5,7 +5,9 @@ import type { PluginUpdateProgress } from '../shared/types'
 
 const api: PluginPilotApi = {
   app: {
-    getVersion: () => ipcRenderer.invoke(IpcChannels.appGetVersion)
+    getVersion: () => ipcRenderer.invoke(IpcChannels.appGetVersion),
+    checkForUpdate: () => ipcRenderer.invoke(IpcChannels.appCheckForUpdate),
+    downloadUpdate: (update) => ipcRenderer.invoke(IpcChannels.appDownloadUpdate, update)
   },
   auth: {
     getUser: () => ipcRenderer.invoke(IpcChannels.authGetUser),

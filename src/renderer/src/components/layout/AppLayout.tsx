@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router'
+import { AppUpdateBanner } from './AppUpdateBanner'
 import { TopBar } from './TopBar'
 import { Sidebar } from './Sidebar'
 
@@ -6,6 +7,7 @@ export function AppLayout(): React.JSX.Element {
   return (
     <div className="flex h-screen flex-col">
       <TopBar />
+      <AppUpdateBanner />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
         <main className="flex-1 overflow-y-auto bg-muted/40 dark:bg-background">

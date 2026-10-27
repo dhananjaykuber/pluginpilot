@@ -18,6 +18,7 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
+    "release:mac": "npm run build:mac && gh release create v$npm_package_version dist/pluginpilot-$npm_package_version.dmg --title v$npm_package_version --generate-notes",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "devDependencies": {

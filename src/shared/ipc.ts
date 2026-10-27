@@ -1,5 +1,6 @@
 import type {
   AppSettings,
+  AppUpdate,
   ChangelogEntry,
   GitHubUser,
   LocalModificationsRequest,
@@ -27,6 +28,8 @@ import type {
 
 export const IpcChannels = {
   appGetVersion: 'app:get-version',
+  appCheckForUpdate: 'app:check-for-update',
+  appDownloadUpdate: 'app:download-update',
   authGetUser: 'auth:get-user',
   authConnect: 'auth:connect',
   authDisconnect: 'auth:disconnect',
@@ -57,6 +60,9 @@ export const IpcChannels = {
 export type PluginPilotApi = {
   app: {
     getVersion: () => Promise<string>
+    // Resolves to null when this is the newest version.
+    checkForUpdate: () => Promise<AppUpdate | null>
+    downloadUpdate: (update: AppUpdate) => Promise<void>
   }
   auth: {
     getUser: () => Promise<GitHubUser | null>

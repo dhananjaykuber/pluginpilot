@@ -20,6 +20,7 @@ focusManager.setEventListener((setFocused) => {
 
 export const queryKeys = {
   appVersion: ['app', 'version'],
+  appUpdate: ['app', 'update'],
   githubUser: ['auth', 'user'],
   projects: ['projects'],
   repositories: ['repositories'],
