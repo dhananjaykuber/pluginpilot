@@ -22,7 +22,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps): React.JSX.Eleme
   const { data: summaries = {} } = useScanSummaries()
 
   return (
-    <Table className="rounded-lg bg-background">
+    <Table className="rounded-lg bg-card">
       <TableHeader>
         <TableRow>
           <TableHead>Repository</TableHead>

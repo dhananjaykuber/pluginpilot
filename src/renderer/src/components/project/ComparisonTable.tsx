@@ -26,7 +26,7 @@ type ComparisonTableProps = {
 
 export function ComparisonTable({ environments, rows }: ComparisonTableProps): React.JSX.Element {
   return (
-    <Table className="rounded-lg bg-background">
+    <Table className="rounded-lg bg-card">
       <TableHeader>
         <TableRow>
           <TableHead>Plugin</TableHead>

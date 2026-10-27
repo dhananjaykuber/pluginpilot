@@ -14,7 +14,7 @@ export function EmptyState({
   action
 }: EmptyStateProps): React.JSX.Element {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed bg-background px-6 py-16 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed bg-card px-6 py-16 text-center">
       <span className="flex size-10 items-center justify-center rounded-full bg-muted">
         <Icon className="size-5 text-muted-foreground" />
       </span>

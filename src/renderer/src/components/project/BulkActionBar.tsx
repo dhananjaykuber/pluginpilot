@@ -33,7 +33,7 @@ export function BulkActionBar({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border bg-background px-4 py-2">
+    <div className="flex items-center justify-between gap-4 rounded-lg border bg-card px-4 py-2">
       <p className="text-sm font-medium">{updates.length} selected</p>
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={onClear}>

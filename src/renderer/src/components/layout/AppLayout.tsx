@@ -8,7 +8,7 @@ export function AppLayout(): React.JSX.Element {
       <TopBar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-muted/40">
+        <main className="flex-1 overflow-y-auto bg-muted/40 dark:bg-background">
           <div className="mx-auto max-w-6xl px-8 py-6">
             <Outlet />
           </div>

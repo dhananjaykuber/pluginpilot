@@ -92,7 +92,7 @@ type PluginsTableFrameProps = {
 
 function PluginsTableFrame({ children, selectAll }: PluginsTableFrameProps): React.JSX.Element {
   return (
-    <Table className="rounded-lg bg-background">
+    <Table className="rounded-lg bg-card">
       <TableHeader>
         <TableRow>
           <TableHead className="w-10">{selectAll}</TableHead>
