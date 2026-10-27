@@ -7,17 +7,16 @@ export function buildUpdateTitle(request: PluginUpdateRequest): string {
 export function buildUpdateBody(request: PluginUpdateRequest, baseBranch: string): string {
   const sections = [
     '## Plugin update',
+    // GitHub tables need a header row, so the plugin row doubles as the header.
     [
-      '| | |',
+      `| Plugin | ${request.name} (\`${request.slug}\`) |`,
       '|---|---|',
-      `| Plugin | **${request.name}** (\`${request.slug}\`) |`,
       `| Version | \`${request.fromVersion}\` → \`${request.toVersion}\` |`,
       `| Environment | ${request.environmentName} (\`${baseBranch}\`) |`,
       `| Path | \`${request.path}\` |`
     ].join('\n'),
     buildSecuritySection(request),
-    `### Changelog\n\nhttps://wordpress.org/plugins/${request.slug}/#developers`,
-    '---\nRaised with PluginPilot.'
+    `### Changelog\n\nhttps://wordpress.org/plugins/${request.slug}/#developers`
   ]
 
   return sections.filter(Boolean).join('\n\n')
