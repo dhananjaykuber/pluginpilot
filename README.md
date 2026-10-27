@@ -78,7 +78,7 @@ Click **Create PR** on a plugin to review the update before anything changes on 
 - Notes for security fixes, major updates and the minimum WordPress and PHP versions
 - **Local changes check**: the committed plugin folder is compared with the original WordPress.org zip of the installed version. If files were edited by hand, they're listed, and you must confirm before they're overwritten.
 
-Then PluginPilot creates the branch `plugin-update/<base-branch>/<slug>-<version>` (for example `plugin-update/develop/wordpress-seo-28.8`) from the environment branch, commits the new version, and opens a pull request. The pull request description includes the version table, requirements, security fixes and changelog notes.
+Then PluginPilot creates the branch `plugin/<base-branch>/<slug>-<version>` (for example `plugin/develop/wordpress-seo-28-8`, with dashes instead of dots in the version) from the environment branch, commits the new version, and opens a pull request. The pull request description includes the version table, requirements, security fixes and changelog notes.
 
 ![Create PR dialog](docs/images/create-pr.png)
 
@@ -182,7 +182,7 @@ PluginPilot never clones repositories. Everything happens through the GitHub API
 | Composer plugin | Only `composer.json` and `composer.lock`. Composer runs locally with `--no-install` in a temporary folder; plugin code is not committed. |
 | Premium plugin (Upload zip) | The plugin folder is replaced with the contents of the zip you choose. |
 
-Every update gets its own branch, `plugin-update/<base-branch>/<slug>-<version>`, created from the selected environment's branch, and a pull request against that branch. Because the base branch is part of the name, the same update can be open for several environments at once.
+Every update gets its own branch, `plugin/<base-branch>/<slug>-<version>`, created from the selected environment's branch, and a pull request against that branch. Because the base branch is part of the name, the same update can be open for several environments at once.
 
 ## Where your data lives
 

@@ -1,5 +1,5 @@
 import type { Octokit } from '@octokit/rest'
-import { UPDATE_BRANCH_PREFIX } from '../../shared/pluginUpdate'
+import { isUpdateBranch } from '../../shared/pluginUpdate'
 import type { UpdatePullRequest } from '../../shared/types'
 import { isUnprocessableError } from './github'
 import { getChecksStatus, getReviewStatus } from './pullRequestStatus'
@@ -55,7 +55,7 @@ export async function listOpenUpdatePullRequests(
   })
 
   const updatePullRequests = pullRequests.filter((pullRequest) =>
-    pullRequest.head.ref.startsWith(UPDATE_BRANCH_PREFIX)
+    isUpdateBranch(pullRequest.head.ref)
   )
 
   return Promise.all(
