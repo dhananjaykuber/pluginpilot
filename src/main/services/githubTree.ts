@@ -25,6 +25,12 @@ type FolderReplacement = Repository & {
   message: string
 }
 
+type TextFileChanges = Repository & {
+  baseBranch: string
+  files: { path: string; content: string }[]
+  message: string
+}
+
 // Keeps each create-tree request well under GitHub's request size limits.
 const MAX_BATCH_ENTRIES = 500
 const MAX_BATCH_BYTES = 5 * 1024 * 1024
@@ -37,10 +43,6 @@ export async function commitFolderReplacement(
   replacement: FolderReplacement
 ): Promise<string> {
   const { owner, repo, baseBranch, folderPath, files, message } = replacement
-  const { data: branch } = await octokit.rest.repos.getBranch({ owner, repo, branch: baseBranch })
-  const baseCommitSha = branch.commit.sha
-  const baseTreeSha = branch.commit.commit.tree.sha
-
   const existingFiles = await listFolderFiles(octokit, { owner, repo }, baseBranch, folderPath)
   const entries = await buildTreeEntries(octokit, { owner, repo }, folderPath, files, existingFiles)
 
@@ -50,13 +52,42 @@ export async function commitFolderReplacement(
     )
   }
 
-  const treeSha = await createTreeInBatches(octokit, { owner, repo }, baseTreeSha, entries)
+  return commitTreeEntries(octokit, { owner, repo }, baseBranch, entries, message)
+}
+
+// Creates a commit on top of `baseBranch` that writes the given text files.
+export function commitTextFiles(octokit: Octokit, changes: TextFileChanges): Promise<string> {
+  const { owner, repo, baseBranch, files, message } = changes
+  const entries: TreeEntry[] = files.map(({ path, content }) => ({
+    path,
+    mode: '100644',
+    type: 'blob',
+    content
+  }))
+
+  return commitTreeEntries(octokit, { owner, repo }, baseBranch, entries, message)
+}
+
+async function commitTreeEntries(
+  octokit: Octokit,
+  repository: Repository,
+  baseBranch: string,
+  entries: TreeEntry[],
+  message: string
+): Promise<string> {
+  const { data: branch } = await octokit.rest.repos.getBranch({ ...repository, branch: baseBranch })
+  const treeSha = await createTreeInBatches(
+    octokit,
+    repository,
+    branch.commit.commit.tree.sha,
+    entries
+  )
+
   const { data: commit } = await octokit.rest.git.createCommit({
-    owner,
-    repo,
+    ...repository,
     message,
     tree: treeSha,
-    parents: [baseCommitSha]
+    parents: [branch.commit.sha]
   })
 
   return commit.sha

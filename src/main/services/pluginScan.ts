@@ -91,7 +91,8 @@ async function scanComposerPlugins(
     name: plugin.slug,
     version: plugin.version,
     source: 'composer',
-    path: `${installPath}/${plugin.slug}`
+    path: `${installPath}/${plugin.slug}`,
+    packageName: plugin.packageName
   }))
 }
 
@@ -128,7 +129,14 @@ async function readFolderPlugin(
     return null
   }
 
-  return { slug, name: header.name, version: header.version, source: 'manual', path: pluginPath }
+  return {
+    slug,
+    name: header.name,
+    version: header.version,
+    source: 'manual',
+    path: pluginPath,
+    packageName: null
+  }
 }
 
 async function readPluginHeader(

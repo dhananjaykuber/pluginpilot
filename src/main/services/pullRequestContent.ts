@@ -13,10 +13,12 @@ export function buildUpdateBody(request: PluginUpdateRequest, baseBranch: string
       '|---|---|',
       `| Version | \`${request.fromVersion}\` → \`${request.toVersion}\` |`,
       `| Environment | ${request.environmentName} (\`${baseBranch}\`) |`,
-      `| Path | \`${request.path}\` |`
+      request.source === 'composer'
+        ? `| Composer package | \`${request.packageName}\` |`
+        : `| Path | \`${request.path}\` |`
     ].join('\n'),
     buildSecuritySection(request),
-    `### Changelog\n\nhttps://wordpress.org/plugins/${request.slug}/#developers`
+    request.changelogUrl && `### Changelog\n\n${request.changelogUrl}`
   ]
 
   return sections.filter(Boolean).join('\n\n')

@@ -52,6 +52,8 @@ export type InstalledPlugin = {
   version: string | null
   source: PluginSource
   path: string
+  // Composer package name, e.g. "wpackagist-plugin/wordpress-seo". null for committed plugins.
+  packageName: string | null
 }
 
 export type PluginScan = {
@@ -92,7 +94,7 @@ export type VulnerabilityReport = {
   bySlug: Record<string, PluginVulnerability[]>
 }
 
-export type PluginUpdateRequest = {
+type PluginUpdateDetails = {
   // Lets the renderer match progress events to the update it started.
   updateId: string
   projectId: string
@@ -102,11 +104,16 @@ export type PluginUpdateRequest = {
   path: string
   fromVersion: string
   toVersion: string
-  downloadUrl: string
+  changelogUrl: string | null
   securityFixes: { title: string; cve: string | null }[]
 }
 
-export type PluginUpdateStep = 'download' | 'commit' | 'pull-request'
+// Committed plugins are replaced with the downloaded zip; Composer plugins only change
+// composer.json and composer.lock.
+export type PluginUpdateRequest = PluginUpdateDetails &
+  ({ source: 'manual'; downloadUrl: string } | { source: 'composer'; packageName: string })
+
+export type PluginUpdateStep = 'prepare' | 'commit' | 'pull-request'
 
 export type PluginUpdateProgress = {
   updateId: string
