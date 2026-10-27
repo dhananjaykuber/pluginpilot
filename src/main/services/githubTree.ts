@@ -35,6 +35,7 @@ type TextFileChanges = Repository & {
 const MAX_BATCH_ENTRIES = 100
 const MAX_BATCH_BYTES = 1024 * 1024
 const BLOB_CONCURRENCY = 8
+const MAX_ATTEMPTS = 3
 
 // Creates a commit on top of `baseBranch` where `folderPath` contains exactly `files`.
 // Only files that changed are sent, and files missing from `files` are deleted.
@@ -160,11 +161,13 @@ async function toTreeEntry(
     return { path, mode: '100644', type: 'blob', content: text }
   }
 
-  const { data: blob } = await octokit.rest.git.createBlob({
-    ...repository,
-    content: content.toString('base64'),
-    encoding: 'base64'
-  })
+  const { data: blob } = await retryOnConnectionError(() =>
+    octokit.rest.git.createBlob({
+      ...repository,
+      content: content.toString('base64'),
+      encoding: 'base64'
+    })
+  )
 
   return { path, mode: '100644', type: 'blob', sha: blob.sha }
 }
@@ -184,22 +187,31 @@ async function createTreeInBatches(
   return treeSha
 }
 
-// When GitHub still times out, the batch is split in half and each half is sent on its own.
+// When the request still times out or the connection drops, the batch is split in half and
+// each half is sent on its own. A single entry is retried a few times instead.
 async function createTree(
   octokit: Octokit,
   repository: Repository,
   baseTreeSha: string,
   entries: TreeEntry[]
 ): Promise<string> {
-  try {
+  const request = async (): Promise<string> => {
     const { data: tree } = await octokit.rest.git.createTree({
       ...repository,
       base_tree: baseTreeSha,
       tree: entries
     })
     return tree.sha
+  }
+
+  if (entries.length < 2) {
+    return retryOnConnectionError(request)
+  }
+
+  try {
+    return await request()
   } catch (error) {
-    if (entries.length < 2 || !isTimeoutError(error)) {
+    if (!isConnectionError(error)) {
       throw error
     }
 
@@ -214,14 +226,27 @@ async function createTree(
   }
 }
 
-// Either GitHub answers that it timed out, or the connection drops before it answers at all
-// (Octokit reports that as a 500 with a message such as "read ETIMEDOUT").
-function isTimeoutError(error: unknown): boolean {
+async function retryOnConnectionError<T>(task: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await task()
+    } catch (error) {
+      if (attempt >= MAX_ATTEMPTS || !isConnectionError(error)) {
+        throw error
+      }
+    }
+  }
+}
+
+// GitHub answers that it timed out, the connection drops before it answers (Octokit reports
+// that as a 500 such as "read ETIMEDOUT"), or the connection drops while the request is still
+// being sent, so GitHub only receives part of it and calls it malformed.
+function isConnectionError(error: unknown): boolean {
   const status = (error as { status?: number }).status
   return (
     status === 502 ||
     status === 504 ||
-    /timed out|ETIMEDOUT|ECONNRESET|socket hang up/i.test(String(error))
+    /timed out|ETIMEDOUT|ECONNRESET|socket hang up|malformed request/i.test(String(error))
   )
 }
 
