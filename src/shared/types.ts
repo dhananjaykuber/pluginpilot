@@ -92,6 +92,33 @@ export type VulnerabilityReport = {
   bySlug: Record<string, PluginVulnerability[]>
 }
 
+export type PluginUpdateRequest = {
+  // Lets the renderer match progress events to the update it started.
+  updateId: string
+  projectId: string
+  environmentName: string
+  slug: string
+  name: string
+  path: string
+  fromVersion: string
+  toVersion: string
+  downloadUrl: string
+  securityFixes: { title: string; cve: string | null }[]
+}
+
+export type PluginUpdateStep = 'download' | 'commit' | 'pull-request'
+
+export type PluginUpdateProgress = {
+  updateId: string
+  step: PluginUpdateStep
+}
+
+export type PluginUpdateResult = {
+  branch: string
+  pullRequestNumber: number
+  pullRequestUrl: string
+}
+
 export type AppSettings = {
   hasWordfenceKey: boolean
 }

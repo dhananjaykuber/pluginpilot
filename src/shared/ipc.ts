@@ -4,6 +4,9 @@ import type {
   NewProject,
   PluginReleases,
   PluginScan,
+  PluginUpdateProgress,
+  PluginUpdateRequest,
+  PluginUpdateResult,
   PluginVersion,
   Project,
   RepositorySetup,
@@ -20,6 +23,8 @@ export const IpcChannels = {
   projectsAdd: 'projects:add',
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
+  pluginsUpdate: 'plugins:update',
+  pluginsUpdateProgress: 'plugins:update-progress',
   repositoriesList: 'repositories:list',
   repositoriesDetectSetup: 'repositories:detect-setup',
   settingsGet: 'settings:get',
@@ -44,6 +49,9 @@ export type PluginPilotApi = {
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
     getReleases: (slugs: string[]) => Promise<PluginReleases>
+    update: (request: PluginUpdateRequest) => Promise<PluginUpdateResult>
+    // Returns a function that stops listening.
+    onUpdateProgress: (listener: (progress: PluginUpdateProgress) => void) => () => void
   }
   repositories: {
     list: () => Promise<RepositorySummary[]>

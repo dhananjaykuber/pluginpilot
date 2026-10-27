@@ -1,6 +1,7 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IpcChannels, type PluginPilotApi } from '../shared/ipc'
+import type { PluginUpdateProgress } from '../shared/types'
 
 const api: PluginPilotApi = {
   app: {
@@ -17,7 +18,15 @@ const api: PluginPilotApi = {
   },
   plugins: {
     scan: (projectId, branch) => ipcRenderer.invoke(IpcChannels.pluginsScan, projectId, branch),
-    getReleases: (slugs) => ipcRenderer.invoke(IpcChannels.pluginsGetReleases, slugs)
+    getReleases: (slugs) => ipcRenderer.invoke(IpcChannels.pluginsGetReleases, slugs),
+    update: (request) => ipcRenderer.invoke(IpcChannels.pluginsUpdate, request),
+    onUpdateProgress: (listener) => {
+      const handleProgress = (_event: IpcRendererEvent, progress: PluginUpdateProgress): void =>
+        listener(progress)
+
+      ipcRenderer.on(IpcChannels.pluginsUpdateProgress, handleProgress)
+      return () => ipcRenderer.removeListener(IpcChannels.pluginsUpdateProgress, handleProgress)
+    }
   },
   repositories: {
     list: () => ipcRenderer.invoke(IpcChannels.repositoriesList),

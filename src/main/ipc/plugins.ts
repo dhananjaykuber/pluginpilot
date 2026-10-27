@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
+import type { PluginUpdateProgress, PluginUpdateRequest } from '../../shared/types'
 import { scanProjectPlugins } from '../services/pluginScan'
+import { updatePlugin } from '../services/pluginUpdate'
 import { getPluginReleases } from '../services/wordpressOrg'
 
 export function registerPluginHandlers(): void {
@@ -9,5 +11,11 @@ export function registerPluginHandlers(): void {
   )
   ipcMain.handle(IpcChannels.pluginsGetReleases, (_event, slugs: string[]) =>
     getPluginReleases(slugs)
+  )
+  ipcMain.handle(IpcChannels.pluginsUpdate, (event, request: PluginUpdateRequest) =>
+    updatePlugin(request, (step) => {
+      const progress: PluginUpdateProgress = { updateId: request.updateId, step }
+      event.sender.send(IpcChannels.pluginsUpdateProgress, progress)
+    })
   )
 }
