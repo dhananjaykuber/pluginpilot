@@ -8,6 +8,9 @@ const api: PluginPilotApi = {
   },
   auth: {
     getUser: () => ipcRenderer.invoke(IpcChannels.authGetUser),
+    startSignIn: () => ipcRenderer.invoke(IpcChannels.authStartSignIn),
+    completeSignIn: () => ipcRenderer.invoke(IpcChannels.authCompleteSignIn),
+    cancelSignIn: () => ipcRenderer.invoke(IpcChannels.authCancelSignIn),
     connect: (token) => ipcRenderer.invoke(IpcChannels.authConnect, token),
     disconnect: () => ipcRenderer.invoke(IpcChannels.authDisconnect)
   },
