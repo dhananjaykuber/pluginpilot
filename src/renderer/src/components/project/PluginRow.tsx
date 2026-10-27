@@ -28,6 +28,9 @@ export function PluginRow({ plugin }: PluginRowProps): React.JSX.Element {
               {plugin.availableVersion} Available
             </Badge>
           )}
+          {plugin.isOnWordPressOrg === false && (
+            <span className="text-xs text-muted-foreground">Not on WordPress.org</span>
+          )}
         </div>
       </TableCell>
     </TableRow>

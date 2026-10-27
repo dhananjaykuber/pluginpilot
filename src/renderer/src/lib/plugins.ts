@@ -9,6 +9,8 @@ export const pluginSourceLabels: Record<PluginSource, string> = {
 export type PluginListItem = InstalledPlugin & {
   displayName: string
   availableVersion: string | null
+  // null while WordPress.org hasn't been checked yet.
+  isOnWordPressOrg: boolean | null
 }
 
 export function toPluginListItems(
@@ -22,7 +24,8 @@ export function toPluginListItems(
       return {
         ...plugin,
         displayName: getDisplayName(plugin, release),
-        availableVersion: getAvailableVersion(plugin, release)
+        availableVersion: getAvailableVersion(plugin, release),
+        isOnWordPressOrg: releases ? release !== null : null
       }
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName))
