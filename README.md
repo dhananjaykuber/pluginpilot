@@ -1,6 +1,6 @@
 # PluginPilot
 
-A desktop app for keeping WordPress plugins up to date across your projects. Add a project's GitHub repository, see every installed plugin with its available update and known vulnerabilities, and open an update pull request against the right environment branch in one click, much like the plugins page of the WordPress VIP dashboard.
+A desktop app for keeping WordPress plugins up to date across all your sites. Add any WordPress project kept in a GitHub repository, on any host, WordPress VIP included. You can see every installed plugin with its available update and known vulnerabilities, and open an update pull request against the right environment branch in one click. That includes the two updates even the VIP dashboard can't do: Composer-managed plugins and premium plugins from a zip.
 
 PluginPilot works entirely through the GitHub API. It never clones your repositories.
 
@@ -38,7 +38,7 @@ Pick any repository your GitHub account can push to. PluginPilot reads the defau
 - Composer: `composer.json`, `composer.lock`, the number of WordPress.org plugins and where Composer installs them
 - Branches, used to suggest environments: `develop` → Development, `staging`/`preprod` → Staging, `main`/`master`/`production` → Production
 
-Every suggestion can be edited before saving, and you can add your own environments (QA, UAT, …).
+Every suggestion can be edited before saving, and you can add your own environments (QA, UAT, …). You can also set **pull request labels**, such as `dependencies`, that are added to every update pull request for the project.
 
 ![Add a project](docs/images/add-project.png)
 
@@ -82,6 +82,10 @@ Then PluginPilot creates the branch `plugin/<base-branch>/<slug>-<version>` (for
 
 ![Create PR dialog](docs/images/create-pr.png)
 
+![Pull request created](docs/images/pr-created.png)
+
+The pull request has the target branch in its title, for example `[master] Update Yoast SEO from 28.6 to 28.8`, so the PR list shows which environment it updates. The project's labels are added automatically.
+
 ![Pull request created by PluginPilot](docs/images/pull-request.png)
 
 ### Bulk pull requests
@@ -96,6 +100,10 @@ Tick several plugins, or use the header checkbox to select every visible plugin 
 ### Premium plugins: Upload zip
 
 Plugins that aren't on WordPress.org (ACF Pro, Gravity Forms, …) get an **Upload zip** button. Download the new version from the vendor, choose the zip, and PluginPilot checks that it's the same plugin at a newer version before opening the pull request the usual way.
+
+Updates that commit plugin code from a zip also get the `skip-phpcs-scan` label, because third-party plugin code isn't written to your repository's coding standards.
+
+![Upload zip pull request](docs/images/upload-zip.png)
 
 ### Pull request status
 
@@ -116,15 +124,17 @@ The **Compare environments** tab shows every plugin's version on each environmen
 
 ### Project settings
 
-Edit a project's plugin folders and environment branches, or delete it from PluginPilot. Deleting never touches the GitHub repository. Open it with the ⚙ button next to **Scan**.
+Edit a project's plugin folders, environment branches and pull request labels, or delete it from PluginPilot. Deleting never touches the GitHub repository, its branches or pull requests. Open it with the ⚙ button next to **Scan**.
 
 ![Project settings](docs/images/project-settings.png)
+
+![Delete a project](docs/images/delete-project.png)
 
 ### Backup and restore
 
 **Settings → Projects backup** exports all projects to a JSON file and imports them again, for a new Mac or to share your setup with a teammate. The file contains repositories, plugin folders and environments only, never your GitHub token or Wordfence key. Imports are validated first, and repositories you already have are skipped.
 
-![Settings](docs/images/project-settings.png)
+![Settings](docs/images/settings.png)
 
 ### Light and dark mode
 
@@ -162,6 +172,8 @@ PluginPilot uses a personal access token, so it can reach every repository your 
 1. [Create a classic token](https://github.com/settings/tokens/new?scopes=repo&description=PluginPilot) with the **`repo`** scope. A 90-day expiration is recommended.
 2. If your organizations use SSO, click **Configure SSO** next to the token on GitHub and authorize each organization. Otherwise their repositories won't appear.
 3. Paste the token into PluginPilot.
+
+![Connect GitHub](docs/images/connect-github.png)
 
 The token is checked with GitHub, encrypted with the macOS Keychain, and stored only on your machine. If it expires or is revoked, PluginPilot signs you out and asks for a new one.
 
@@ -237,6 +249,8 @@ src/
 The renderer never talks to GitHub or the file system directly. It calls `window.api`, defined once in `src/shared/ipc.ts`, and the main process does the work.
 
 <!--
-  Images: screenshots live in docs/images/. Crop them to the app window (no macOS title bar,
-  menu bar or Dock) and blur client repository, organization and plugin names.
+  Images: screenshots live in docs/images/. Most are frames from the launch video, rendered from
+  the real app with fictional demo data (acme-agency), so nothing needs blurring. For any other
+  screenshot, crop it to the app window (no macOS title bar, menu bar or Dock) and blur client
+  repository, organization and plugin names.
 -->
