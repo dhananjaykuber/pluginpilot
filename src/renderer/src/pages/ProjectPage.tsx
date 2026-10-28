@@ -10,6 +10,7 @@ import { EnvironmentComparison } from '@/components/project/EnvironmentCompariso
 import { ScanAllButton } from '@/components/project/ScanAllButton'
 import { ScanButton } from '@/components/project/ScanButton'
 import { ProjectSettingsButton } from '@/components/project/ProjectSettingsButton'
+import { ViewOnGitHubButton } from '@/components/project/ViewOnGitHubButton'
 import { useProject } from '@/hooks/useProject'
 import { useSelectedEnvironment } from '@/hooks/useSelectedEnvironment'
 import { useProjectView, type ProjectView } from '@/hooks/useProjectView'
@@ -70,6 +71,10 @@ function ProjectPlugins({ project }: { project: Project }): React.JSX.Element {
                 <ScanButton projectId={project.id} branch={environment.branch} />
               </>
             )}
+            <ViewOnGitHubButton
+              repo={project.repo}
+              branch={isCompareView ? null : environment.branch}
+            />
             <ProjectSettingsButton projectId={project.id} />
           </>
         }
