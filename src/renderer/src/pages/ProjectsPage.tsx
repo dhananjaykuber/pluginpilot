@@ -2,6 +2,7 @@ import { FolderGit2Icon } from 'lucide-react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
 import { AddProjectButton } from '@/components/projects/AddProjectButton'
+import { ScanAllProjectsButton } from '@/components/projects/ScanAllProjectsButton'
 import { ProjectsTable } from '@/components/projects/ProjectsTable'
 import { useProjects } from '@/hooks/useProjects'
 
@@ -11,7 +12,12 @@ export function ProjectsPage(): React.JSX.Element {
       <PageHeader
         title="Projects"
         description="WordPress projects you manage. Open a project to review its plugins and raise update pull requests."
-        actions={<AddProjectButton />}
+        actions={
+          <>
+            <ScanAllProjectsButton />
+            <AddProjectButton />
+          </>
+        }
       />
       <ProjectsContent />
     </>

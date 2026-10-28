@@ -3,6 +3,7 @@ import { IpcChannels } from '../../shared/ipc'
 import type { NewProject, ProjectChanges, ScanSummary } from '../../shared/types'
 import { addProject, deleteProject, listProjects, updateProject } from '../services/projects'
 import { exportProjects, importProjects } from '../services/projectTransfer'
+import { scanAllAndAnnounce } from '../services/scanAlerts'
 import { listScanSummaries, saveScanSummary } from '../services/scanSummaries'
 
 export function registerProjectHandlers(): void {
@@ -26,4 +27,5 @@ export function registerProjectHandlers(): void {
     (_event, projectId: string, environmentName: string, summary: ScanSummary) =>
       saveScanSummary(projectId, environmentName, summary)
   )
+  ipcMain.handle(IpcChannels.projectsScanAll, () => scanAllAndAnnounce())
 }

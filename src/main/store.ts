@@ -7,12 +7,18 @@ type StoreSchema = {
   encryptedGitHubToken?: string
   encryptedWordfenceKey?: string
   cachedRepositories?: RepositorySummary[]
+  backgroundChecks: boolean
+  lastScanAllAt?: string
+  // Critical vulnerabilities already notified about, so each one is only announced once.
+  notifiedVulnerabilities: string[]
 }
 
 export const store = new Store<StoreSchema>({
   name: 'pluginpilot',
   defaults: {
     projects: [],
-    scanSummaries: {}
+    scanSummaries: {},
+    backgroundChecks: false,
+    notifiedVulnerabilities: []
   }
 })

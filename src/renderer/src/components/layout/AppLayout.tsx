@@ -1,9 +1,12 @@
 import { Outlet } from 'react-router'
+import { useScanAllSync } from '@/hooks/useScanAll'
 import { AppUpdateBanner } from './AppUpdateBanner'
 import { TopBar } from './TopBar'
 import { Sidebar } from './Sidebar'
 
 export function AppLayout(): React.JSX.Element {
+  useScanAllSync()
+
   return (
     <div className="flex h-screen flex-col">
       <TopBar />

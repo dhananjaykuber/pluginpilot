@@ -1,13 +1,19 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IpcChannels, type PluginPilotApi } from '../shared/ipc'
-import type { PluginUpdateProgress } from '../shared/types'
+// Subscribes to a main-process event and returns a function that stops listening.
+function listen<T>(channel: string, listener: (payload: T) => void): () => void {
+  const handle = (_event: IpcRendererEvent, payload: T): void => listener(payload)
+  ipcRenderer.on(channel, handle)
+  return () => ipcRenderer.removeListener(channel, handle)
+}
 
 const api: PluginPilotApi = {
   app: {
     getVersion: () => ipcRenderer.invoke(IpcChannels.appGetVersion),
     checkForUpdate: () => ipcRenderer.invoke(IpcChannels.appCheckForUpdate),
-    downloadUpdate: (update) => ipcRenderer.invoke(IpcChannels.appDownloadUpdate, update)
+    downloadUpdate: (update) => ipcRenderer.invoke(IpcChannels.appDownloadUpdate, update),
+    onNavigate: (listener) => listen(IpcChannels.appNavigate, listener)
   },
   auth: {
     getUser: () => ipcRenderer.invoke(IpcChannels.authGetUser),
@@ -24,7 +30,10 @@ const api: PluginPilotApi = {
     importAll: () => ipcRenderer.invoke(IpcChannels.projectsImport),
     listScanSummaries: () => ipcRenderer.invoke(IpcChannels.projectsListScanSummaries),
     saveScanSummary: (projectId, environmentName, summary) =>
-      ipcRenderer.invoke(IpcChannels.projectsSaveScanSummary, projectId, environmentName, summary)
+      ipcRenderer.invoke(IpcChannels.projectsSaveScanSummary, projectId, environmentName, summary),
+    scanAll: () => ipcRenderer.invoke(IpcChannels.projectsScanAll),
+    onScanAllProgress: (listener) => listen(IpcChannels.projectsScanAllProgress, listener),
+    onScanAllFinished: (listener) => listen(IpcChannels.projectsScanAllFinished, listener)
   },
   plugins: {
     scan: (projectId, branch) => ipcRenderer.invoke(IpcChannels.pluginsScan, projectId, branch),
@@ -37,13 +46,7 @@ const api: PluginPilotApi = {
       ipcRenderer.invoke(IpcChannels.pluginsListUpdatePullRequests, projectId, baseBranch),
     chooseZip: (expected) => ipcRenderer.invoke(IpcChannels.pluginsChooseZip, expected),
     update: (request) => ipcRenderer.invoke(IpcChannels.pluginsUpdate, request),
-    onUpdateProgress: (listener) => {
-      const handleProgress = (_event: IpcRendererEvent, progress: PluginUpdateProgress): void =>
-        listener(progress)
-
-      ipcRenderer.on(IpcChannels.pluginsUpdateProgress, handleProgress)
-      return () => ipcRenderer.removeListener(IpcChannels.pluginsUpdateProgress, handleProgress)
-    }
+    onUpdateProgress: (listener) => listen(IpcChannels.pluginsUpdateProgress, listener)
   },
   repositories: {
     list: () => ipcRenderer.invoke(IpcChannels.repositoriesList),
@@ -54,7 +57,9 @@ const api: PluginPilotApi = {
   settings: {
     get: () => ipcRenderer.invoke(IpcChannels.settingsGet),
     setWordfenceKey: (apiKey) => ipcRenderer.invoke(IpcChannels.settingsSetWordfenceKey, apiKey),
-    clearWordfenceKey: () => ipcRenderer.invoke(IpcChannels.settingsClearWordfenceKey)
+    clearWordfenceKey: () => ipcRenderer.invoke(IpcChannels.settingsClearWordfenceKey),
+    setBackgroundChecks: (enabled) =>
+      ipcRenderer.invoke(IpcChannels.settingsSetBackgroundChecks, enabled)
   },
   vulnerabilities: {
     check: (plugins) => ipcRenderer.invoke(IpcChannels.vulnerabilitiesCheck, plugins)

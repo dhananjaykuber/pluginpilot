@@ -1,6 +1,8 @@
 import type {
   AppSettings,
   AppUpdate,
+  ScanAllProgress,
+  ScanAllResult,
   ChangelogEntry,
   GitHubUser,
   LocalModificationsRequest,
@@ -30,6 +32,7 @@ export const IpcChannels = {
   appGetVersion: 'app:get-version',
   appCheckForUpdate: 'app:check-for-update',
   appDownloadUpdate: 'app:download-update',
+  appNavigate: 'app:navigate',
   authGetUser: 'auth:get-user',
   authConnect: 'auth:connect',
   authDisconnect: 'auth:disconnect',
@@ -41,6 +44,9 @@ export const IpcChannels = {
   projectsImport: 'projects:import',
   projectsListScanSummaries: 'projects:list-scan-summaries',
   projectsSaveScanSummary: 'projects:save-scan-summary',
+  projectsScanAll: 'projects:scan-all',
+  projectsScanAllProgress: 'projects:scan-all-progress',
+  projectsScanAllFinished: 'projects:scan-all-finished',
   pluginsScan: 'plugins:scan',
   pluginsGetReleases: 'plugins:get-releases',
   pluginsGetChangelog: 'plugins:get-changelog',
@@ -55,6 +61,7 @@ export const IpcChannels = {
   settingsGet: 'settings:get',
   settingsSetWordfenceKey: 'settings:set-wordfence-key',
   settingsClearWordfenceKey: 'settings:clear-wordfence-key',
+  settingsSetBackgroundChecks: 'settings:set-background-checks',
   vulnerabilitiesCheck: 'vulnerabilities:check'
 } as const
 
@@ -64,6 +71,8 @@ export type PluginPilotApi = {
     // Resolves to null when this is the newest version.
     checkForUpdate: () => Promise<AppUpdate | null>
     downloadUpdate: (update: AppUpdate) => Promise<void>
+    // A path to open, e.g. after clicking a notification. Returns a function that stops listening.
+    onNavigate: (listener: (path: string) => void) => () => void
   }
   auth: {
     getUser: () => Promise<GitHubUser | null>
@@ -84,6 +93,11 @@ export type PluginPilotApi = {
       environmentName: string,
       summary: ScanSummary
     ) => Promise<void>
+    // Scans every environment of every project. Both listeners return a function that stops
+    // listening; "finished" also fires after background checks.
+    scanAll: () => Promise<ScanAllResult>
+    onScanAllProgress: (listener: (progress: ScanAllProgress) => void) => () => void
+    onScanAllFinished: (listener: (result: ScanAllResult) => void) => () => void
   }
   plugins: {
     scan: (projectId: string, branch: string) => Promise<PluginScan>
@@ -111,6 +125,7 @@ export type PluginPilotApi = {
     get: () => Promise<AppSettings>
     setWordfenceKey: (apiKey: string) => Promise<AppSettings>
     clearWordfenceKey: () => Promise<AppSettings>
+    setBackgroundChecks: (enabled: boolean) => Promise<AppSettings>
   }
   vulnerabilities: {
     // Resolves to null when no Wordfence API key is configured.

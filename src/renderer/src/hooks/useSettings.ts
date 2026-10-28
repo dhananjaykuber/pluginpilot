@@ -23,6 +23,15 @@ export function useClearWordfenceKey(): UseMutationResult<AppSettings, Error, vo
   return useSettingsMutation(() => window.api.settings.clearWordfenceKey())
 }
 
+export function useSetBackgroundChecks(): UseMutationResult<AppSettings, Error, boolean> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (enabled: boolean) => window.api.settings.setBackgroundChecks(enabled),
+    onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings)
+  })
+}
+
 // Changing the Wordfence key changes vulnerability results, so those are refetched too.
 function useSettingsMutation<TVariables>(
   mutationFn: (variables: TVariables) => Promise<AppSettings>

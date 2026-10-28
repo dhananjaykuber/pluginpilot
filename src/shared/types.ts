@@ -224,6 +224,36 @@ export type UpdatePullRequest = {
 
 export type AppSettings = {
   hasWordfenceKey: boolean
+  // Scan all projects every few hours while the app is open, and notify about new critical issues.
+  backgroundChecks: boolean
+}
+
+// One environment checked by "Scan all". `scan` is null when it failed, with `error` saying why.
+export type EnvironmentScanResult = {
+  projectId: string
+  environmentName: string
+  scan: PluginScan | null
+  error: string | null
+}
+
+export type CriticalVulnerability = {
+  projectId: string
+  repoName: string
+  environmentName: string
+  pluginName: string
+  title: string
+}
+
+export type ScanAllResult = {
+  results: EnvironmentScanResult[]
+  // Critical vulnerabilities found across all projects, and the ones not reported before.
+  criticalCount: number
+  newCritical: CriticalVulnerability[]
+}
+
+export type ScanAllProgress = {
+  done: number
+  total: number
 }
 
 // A newer PluginPilot release on GitHub.

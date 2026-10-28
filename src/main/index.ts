@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './ipc'
+import { scheduleBackgroundChecks } from './services/backgroundChecks'
 
 function createWindow(): void {
   // Create the browser window.
@@ -62,6 +63,7 @@ app.whenReady().then(() => {
   registerIpcHandlers()
 
   createWindow()
+  scheduleBackgroundChecks()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

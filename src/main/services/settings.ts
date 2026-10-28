@@ -1,9 +1,14 @@
 import type { AppSettings } from '../../shared/types'
+import { store } from '../store'
+import { scheduleBackgroundChecks } from './backgroundChecks'
 import { clearSecret, getSecret, saveSecret } from './secrets'
 import { verifyWordfenceKey } from './wordfence'
 
 export function getSettings(): AppSettings {
-  return { hasWordfenceKey: getSecret('encryptedWordfenceKey') !== null }
+  return {
+    hasWordfenceKey: getSecret('encryptedWordfenceKey') !== null,
+    backgroundChecks: store.get('backgroundChecks')
+  }
 }
 
 export async function setWordfenceKey(apiKey: string): Promise<AppSettings> {
@@ -17,5 +22,11 @@ export async function setWordfenceKey(apiKey: string): Promise<AppSettings> {
 
 export function clearWordfenceKey(): AppSettings {
   clearSecret('encryptedWordfenceKey')
+  return getSettings()
+}
+
+export function setBackgroundChecks(enabled: boolean): AppSettings {
+  store.set('backgroundChecks', enabled)
+  scheduleBackgroundChecks()
   return getSettings()
 }

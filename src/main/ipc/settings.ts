@@ -1,6 +1,11 @@
 import { ipcMain } from 'electron'
 import { IpcChannels } from '../../shared/ipc'
-import { clearWordfenceKey, getSettings, setWordfenceKey } from '../services/settings'
+import {
+  clearWordfenceKey,
+  getSettings,
+  setBackgroundChecks,
+  setWordfenceKey
+} from '../services/settings'
 
 export function registerSettingsHandlers(): void {
   ipcMain.handle(IpcChannels.settingsGet, () => getSettings())
@@ -8,4 +13,7 @@ export function registerSettingsHandlers(): void {
     setWordfenceKey(apiKey)
   )
   ipcMain.handle(IpcChannels.settingsClearWordfenceKey, () => clearWordfenceKey())
+  ipcMain.handle(IpcChannels.settingsSetBackgroundChecks, (_event, enabled: boolean) =>
+    setBackgroundChecks(enabled)
+  )
 }
