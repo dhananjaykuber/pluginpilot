@@ -1,6 +1,7 @@
 import type { RepositorySummary } from '../../shared/types'
 import { mapWithConcurrency } from './concurrency'
 import { getAuthenticatedOctokit } from './github'
+import { saveCachedRepositories } from './repositoryCache'
 
 const PAGE_SIZE = 100
 const PAGE_CONCURRENCY = 12
@@ -25,7 +26,7 @@ export async function listAccessibleRepositories(): Promise<RepositorySummary[]>
     async (page) => (await listPage(page)).data
   )
 
-  return [firstPage.data, ...otherPages]
+  const repositories = [firstPage.data, ...otherPages]
     .flat()
     .filter((repository) => repository.permissions?.push)
     .map((repository) => ({
@@ -36,6 +37,9 @@ export async function listAccessibleRepositories(): Promise<RepositorySummary[]>
       defaultBranch: repository.default_branch,
       ownerAvatarUrl: repository.owner.avatar_url
     }))
+
+  saveCachedRepositories(repositories)
+  return repositories
 }
 
 // '<…&page=12>; rel="last"' → 12. Without a "last" link there's only one page.

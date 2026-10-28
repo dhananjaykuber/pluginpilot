@@ -24,6 +24,7 @@ export const queryKeys = {
   githubUser: ['auth', 'user'],
   projects: ['projects'],
   repositories: ['repositories'],
+  cachedRepositories: ['repositories', 'cached'],
   repositorySetup: (fullName: string, branch: string) => [
     'repositories',
     fullName,

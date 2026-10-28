@@ -50,6 +50,7 @@ export const IpcChannels = {
   pluginsUpdate: 'plugins:update',
   pluginsUpdateProgress: 'plugins:update-progress',
   repositoriesList: 'repositories:list',
+  repositoriesListCached: 'repositories:list-cached',
   repositoriesDetectSetup: 'repositories:detect-setup',
   settingsGet: 'settings:get',
   settingsSetWordfenceKey: 'settings:set-wordfence-key',
@@ -102,6 +103,8 @@ export type PluginPilotApi = {
   }
   repositories: {
     list: () => Promise<RepositorySummary[]>
+    // The list from the last successful load; null before the first one.
+    listCached: () => Promise<RepositorySummary[] | null>
     detectSetup: (owner: string, repo: string, branch: string) => Promise<RepositorySetup>
   }
   settings: {

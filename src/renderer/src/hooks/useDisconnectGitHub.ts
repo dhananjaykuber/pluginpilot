@@ -6,6 +6,10 @@ export function useDisconnectGitHub(): UseMutationResult<void, Error, void> {
 
   return useMutation({
     mutationFn: () => window.api.auth.disconnect(),
-    onSuccess: () => queryClient.setQueryData(queryKeys.githubUser, null)
+    onSuccess: () => {
+      queryClient.setQueryData(queryKeys.githubUser, null)
+      // The next account must not see this account's repositories.
+      queryClient.removeQueries({ queryKey: queryKeys.repositories })
+    }
   })
 }
